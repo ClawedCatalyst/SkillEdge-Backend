@@ -14,8 +14,3 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
-
-@api_view(['GET'])
-def getDetails(request):
-    routes = ['Suhail', 'Shreyansh']
-    return Response(routes)
