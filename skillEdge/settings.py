@@ -21,8 +21,8 @@ import os
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-u+n)#*$c@)#5ninfooe2-0%hkzma(7hg)#y0$rhz8&^22+ejgq"
+SECRET_KEY = 'django-insecure-u+n)#*$c@)#5ninfooe2-0%hkzma(7hg)#y0$rhz8&^22+ejgq'
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -175,4 +175,12 @@ STATIC_ROOT = BASE_DIR / 'static'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
+AUTH_USER_MODEL = 'base.NewUserRegistration'
 CORS_ALLOW_ALL_ORIGINS = True
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'skilledge.contact@gmail.com'
+EMAIL_HOST_PASSWORD = 'buceldtjzkdtgevc'
