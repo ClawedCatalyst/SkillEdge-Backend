@@ -13,7 +13,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         token = super().get_token(user)
 
         token['user_name'] = user.user_name
-        return token
+        return (token)
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
@@ -27,6 +27,6 @@ class NewUserRegistration(APIView):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             context = {'msg':'Registration Successfull'}
-            return Response(context, status=status.HTTP_201_CREATED)
+            return Response(context, status=status.HTTP_200_OK)
         return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
         

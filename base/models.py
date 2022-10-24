@@ -44,7 +44,7 @@ class NewUserRegistration(AbstractBaseUser):
     email = models.EmailField(verbose_name='email address',
         max_length=255,
         unique=True,)
-    name = models.CharField(max_length=150, unique=True)
+    name = models.CharField(max_length=150, default=None)
     user_name = models.CharField(max_length=150, blank=True, null=True, default='none')
 
     is_active = models.BooleanField(default=True)
