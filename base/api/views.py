@@ -50,7 +50,7 @@ class otp_check(APIView):
                 context = {'msg':'otp is not valid'}
                 return Response(context, status=status.HTTP_400_BAD_REQUEST)
 
-            user=user.first()
+            user = user.first()
             user.is_verified = True
             user.save()
             
