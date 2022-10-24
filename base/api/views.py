@@ -49,6 +49,10 @@ class otp_check(APIView):
                 context = {'msg':'user does not exist'}
                 return Response(context, status=status.HTTP_400_BAD_REQUEST)
 
+            if not len(user[0].otp) == 4:
+                context = {'msg':'generate new otp request'}
+                return Response(context, status=status.HTTP_400_BAD_REQUEST)
+
             if not user[0].otp == otp:
                 context = {'msg':'otp is not valid'}
                 return Response(context, status=status.HTTP_400_BAD_REQUEST)
@@ -57,13 +61,21 @@ class otp_check(APIView):
                 message = {'message':'OTP expired'}
                 return Response(message,status=status.HTTP_400_BAD_REQUEST)    
             
+
+
             user = user.first()
             user.is_verified = True
+            user.otp = random.randint(101 , 999)
             user.save()
             
 
             context = {'msg':'verification Successfull'}
             return Response(context, status=status.HTTP_200_OK)
 
-
-        
+class resetpassView(APIView):
+    def post(self, request):
+        ser = resetpassserializer(data=request.data)
+        if ser.is_valid(raise_exception=True):
+            send_otp(ser.data['email'])
+            context = {'msg':'check mail for otp'}
+            return Response(context, status=status.HTTP_200_OK)

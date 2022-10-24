@@ -26,3 +26,6 @@ class NewUserSerializer(ModelSerializer):
 class otpcheckserializer(serializers.Serializer):
     email = serializers.EmailField()
     otp = serializers.CharField()
+
+class resetpassserializer(serializers.Serializer):
+    email = serializers.EmailField()
