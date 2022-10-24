@@ -2,9 +2,11 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
+from django.utils import timezone
 from .serializers import *
 from .mail import *
 from base.models import *
+from datetime import datetime, timedelta
 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -40,7 +42,8 @@ class otp_check(APIView):
         if ser.is_valid(raise_exception=True):
             email = ser.data['email']
             otp = ser.data['otp']
-
+            userOTP = OTP.objects.get(verifyEmail__iexact = email)
+            
             user = NewUserRegistration.objects.filter(email = email)
             if not user.exists():
                 context = {'msg':'user does not exist'}
@@ -49,7 +52,11 @@ class otp_check(APIView):
             if not user[0].otp == otp:
                 context = {'msg':'otp is not valid'}
                 return Response(context, status=status.HTTP_400_BAD_REQUEST)
-
+            
+            if userOTP.time_created + timedelta(minutes=2) < timezone.now():
+                message = {'message':'OTP expired'}
+                return Response(message,status=status.HTTP_400_BAD_REQUEST)    
+            
             user = user.first()
             user.is_verified = True
             user.save()
@@ -57,5 +64,6 @@ class otp_check(APIView):
 
             context = {'msg':'verification Successfull'}
             return Response(context, status=status.HTTP_200_OK)
+
 
         
