@@ -5,7 +5,7 @@ from django.contrib.auth.models import (
 )
 
 class MyUserManager(BaseUserManager):
-    def create_user(self, email, name, user_name, date_of_birth, password=None, confirm_password=None):
+    def create_user(self, email, name, user_name, password=None, confirm_password=None):
         """
         Creates and saves a User with the given email, name,date of
         birth and password.
@@ -17,14 +17,13 @@ class MyUserManager(BaseUserManager):
             email=self.normalize_email(email),
             name=name,
             user_name=user_name,
-            date_of_birth=date_of_birth,
         )
 
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, name, user_name, date_of_birth, password=None,):
+    def create_superuser(self, email, name, user_name, password=None,):
         """
         Creates and saves a superuser with the given email,name, date of
         birth and password.
@@ -34,7 +33,6 @@ class MyUserManager(BaseUserManager):
             password=password,
             name=name,
             user_name=user_name,
-            date_of_birth=date_of_birth,
         )
         user.is_admin = True
         user.save(using=self._db)
@@ -46,17 +44,18 @@ class NewUserRegistration(AbstractBaseUser):
     email = models.EmailField(verbose_name='email address',
         max_length=255,
         unique=True,)
-    name = models.CharField(max_length=150)
+    name = models.CharField(max_length=150, default=None)
     user_name = models.CharField(max_length=150, blank=True, null=True, default='none')
-    date_of_birth = models.DateTimeField(blank=True, null=True)
+    otp = models.CharField(max_length=4, blank=True, null=True)
 
+    is_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
 
     objects = MyUserManager()
     
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['name','user_name','date_of_birth',]
+    REQUIRED_FIELDS = ['name','user_name',]
     
     def __str__(self):
         return self.email

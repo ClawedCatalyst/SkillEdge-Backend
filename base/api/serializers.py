@@ -6,7 +6,7 @@ class NewUserSerializer(ModelSerializer):
     confirm_password = serializers.CharField(style={'input_type':'password'}, write_only=True)
     class Meta:
         model = NewUserRegistration
-        fields = ["name", "user_name", "email" ,"date_of_birth", "password", "confirm_password"]
+        fields = ["name", "user_name", "email", "password", "confirm_password", "is_verified"]
         extra_kwargs={
             'password':{'write_only': True}
         }
@@ -23,3 +23,6 @@ class NewUserSerializer(ModelSerializer):
     def create(self, validate_data):
         return NewUserRegistration.objects.create_user(**validate_data)
 
+class otpcheckserializer(serializers.Serializer):
+    email = serializers.EmailField()
+    otp = serializers.CharField()
