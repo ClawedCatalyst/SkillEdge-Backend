@@ -51,7 +51,7 @@ class NewUserRegistration(AbstractBaseUser):
     is_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
-
+    
     objects = MyUserManager()
     
     USERNAME_FIELD = 'email'
@@ -75,3 +75,11 @@ class NewUserRegistration(AbstractBaseUser):
         "Is the user a member of staff?"
         # Simplest possible answer: All admins are staff
         return self.is_admin
+    
+class OTP(models.Model):
+     verifyEmail = models.EmailField(max_length=255,default=True)
+     time_created = models.DateTimeField(default=timezone.now)
+     
+     def __str__(self):
+         return self.time_created
+        
