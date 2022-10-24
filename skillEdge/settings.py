@@ -20,13 +20,13 @@ from datetime import timedelta
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-u+n)#*$c@)#5ninfooe2-0%hkzma(7hg)#y0$rhz8&^22+ejgq'
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["skilledge.herokuapp.com","0.0.0.0","127.0.0.1"]
 
 
 # Application definition
@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
+    "corsheaders",
 ]
 
 REST_FRAMEWORK = {
@@ -85,6 +86,11 @@ SIMPLE_JWT = {
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
+
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -160,8 +166,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'static'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+AUTH_USER_MODEL = 'base.NewUserRegistration'
+CORS_ALLOW_ALL_ORIGINS = True
