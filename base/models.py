@@ -46,7 +46,9 @@ class NewUserRegistration(AbstractBaseUser):
         unique=True,)
     name = models.CharField(max_length=150, default=None)
     user_name = models.CharField(max_length=150, blank=True, null=True, default='none')
+    otp = models.CharField(max_length=4, blank=True, null=True)
 
+    is_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
 
