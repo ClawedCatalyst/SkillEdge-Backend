@@ -28,7 +28,6 @@ class MyTokenObtainPairView(TokenObtainPairView):
 class NewUserRegistrationView(APIView):
     def post(self, request, format=None):
         serializer = NewUserSerializer(data=request.data)
-        
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             send_otp(serializer.data['email'])
