@@ -43,6 +43,13 @@ class otp_check(APIView):
         if ser.is_valid(raise_exception=True):
             email = ser.data['email']
             otp = ser.data['otp']
+
+            email = ser.data['email']
+                query  = OTP.objects.filter(verifyEmail = email)
+                if not query.exists():
+                    context = {'msg':'please raise otp first'}
+                    return Response(context, status=status.HTTP_400_BAD_REQUEST)
+
             userOTP = OTP.objects.get(verifyEmail__iexact = email)
             
             user = NewUserRegistration.objects.filter(email = email)
