@@ -28,7 +28,6 @@ class MyTokenObtainPairView(TokenObtainPairView):
 class NewUserRegistrationView(APIView):
     def post(self, request, format=None):
         serializer = NewUserSerializer(data=request.data)
-        
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             send_otp(serializer.data['email'])
@@ -39,17 +38,20 @@ class NewUserRegistrationView(APIView):
 class otp_check(APIView):
     def post(self, request):
         ser = otpcheckserializer(data=request.data)
-
+        
         if ser.is_valid(raise_exception=True):
             email = ser.data['email']
             otp = ser.data['otp']
-
+            
             email = ser.data['email']
             query  = OTP.objects.filter(verifyEmail = email)
             if not query.exists():
                 context = {'msg':'please raise otp first'}
                 return Response(context, status=status.HTTP_400_BAD_REQUEST)
-
+            
+            userOTP = OTP.objects.get(verifyEmail__iexact = email)
+            
+            
             user = NewUserRegistration.objects.filter(email = email)
             if not user.exists():
                 context = {'msg':'user does not exist'}
@@ -63,8 +65,6 @@ class otp_check(APIView):
                 context = {'msg':'otp is not valid'}
                 return Response(context, status=status.HTTP_400_BAD_REQUEST)
             
-            userOTP = OTP.objects.get(verifyEmail__iexact = email)
-
             if userOTP.time_created + timedelta(minutes=2) < timezone.now():
                 message = {'message':'OTP expired'}
                 return Response(message,status=status.HTTP_400_BAD_REQUEST)    
