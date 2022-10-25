@@ -23,6 +23,14 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
     
+class listOfRegisteredUser(APIView):
+     def get(self, request, format = None):
+        users = NewUserRegistration.objects.all()
+        serializer = NewUserSerializer(users, many = True)
+        Serializer_list = [serializer.data]
+
+        return Response(Serializer_list)
+
 
 
 class NewUserRegistrationView(APIView):
