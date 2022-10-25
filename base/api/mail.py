@@ -10,6 +10,7 @@ def send_otp(email):
     email_by = settings.EMAIL_HOST
     send_mail(subject , otp_msg , email_by , [email])
     user = NewUserRegistration.objects.get(email = email)
+    OTP.objects.filter(verifyEmail__iexact = user).delete()
     OTP.objects.create(verifyEmail = user,time_created = timezone.now()) 
     user.otp = otp
     user.save()
