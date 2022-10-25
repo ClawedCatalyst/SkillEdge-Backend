@@ -6,7 +6,6 @@ from . import views
 from .views import *
 
 from rest_framework_simplejwt.views import (
-    # TokenObtainPairView,
     TokenRefreshView,
 )
 
@@ -17,4 +16,5 @@ urlpatterns = [
     path('otp_verify/', otp_check.as_view(), name='otp_verification'),
     path('reset_password/', resetpassView.as_view(), name='resetpass'),
     path('enter_new_password/', newpassView.as_view(), name='newpass'),
+    path('list_of_registered_users/',listOfRegisteredUser.as_view(), name='listOfRegisteredUser')
 ]
