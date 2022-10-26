@@ -45,7 +45,7 @@ class NewUserRegistration(AbstractBaseUser):
         max_length=255,
         unique=True,)
     name = models.CharField(max_length=150, default=None)
-    user_name = models.CharField(max_length=150, blank=True, null=True, default='none')
+    user_name = models.CharField(max_length=150, blank=True, null=True, default=None, unique=True)
     otp = models.CharField(max_length=4, blank=True, null=True)
 
     is_verified = models.BooleanField(default=False)
