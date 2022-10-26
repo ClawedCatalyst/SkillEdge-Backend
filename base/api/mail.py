@@ -6,7 +6,7 @@ from base.models import *
 def send_otp(email):
     subject = "Here's your account verification mail"
     otp = random.randint(1001 , 9999)
-    otp_msg = f" your otp for account verification is {otp} "
+    otp_msg = f"Your One Time Password for verification on Skill-Edge is {otp}.\nValid for only 2 minutes.\nDO NOT SHARE IT WITH ANYBODY. "
     email_by = settings.EMAIL_HOST
     send_mail(subject , otp_msg , email_by , [email])
     user = NewUserRegistration.objects.get(email = email)
