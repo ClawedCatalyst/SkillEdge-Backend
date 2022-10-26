@@ -76,7 +76,7 @@ class otp_check(APIView):
                 return Response(context, status=status.HTTP_400_BAD_REQUEST)
             
             if userOTP.time_created + timedelta(minutes=2) < timezone.now():
-                context = {'msg':'OTP expired'}
+                message = {'msg':'OTP expired'}
                 return Response(message,status=status.HTTP_400_BAD_REQUEST)    
             
 
@@ -89,6 +89,22 @@ class otp_check(APIView):
 
             context = {'msg':'verification Successfull'}
             return Response(context, status=status.HTTP_200_OK)
+
+class resend_otp(APIView):
+    def post(self, request, format=None):
+        ser = resetpassserializer(data=request.data)
+        if ser.is_valid(raise_exception=True):
+            email = ser.data['email']
+            user = NewUserRegistration.objects.get(email = email)
+            if user.is_verified == True:
+                context = {'msg':'user already verified'}
+                return Response(context, status=status.HTTP_400_BAD_REQUEST)
+
+            send_otp(ser.data['email'])
+            context = {'msg':'check mail for otp'}
+            return Response(context, status=status.HTTP_200_OK)
+
+
 
 class resetpassView(APIView):
     def post(self, request):
