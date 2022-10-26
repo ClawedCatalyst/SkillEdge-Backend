@@ -151,7 +151,6 @@ class newpassView(APIView):
                 return Response(context, status=status.HTTP_400_BAD_REQUEST)
 
 
-
             if not len(user[0].otp) == 4:
                 context = {'msg':'generate new otp request'}
                 return Response(context, status=status.HTTP_400_BAD_REQUEST)
