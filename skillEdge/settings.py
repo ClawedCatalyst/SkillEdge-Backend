@@ -184,3 +184,7 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'skilledge.contactus@gmail.com'
 EMAIL_HOST_PASSWORD = 'hzpgjxhybnwcemgm'
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://skilledge.herokuapp.com'
+]
