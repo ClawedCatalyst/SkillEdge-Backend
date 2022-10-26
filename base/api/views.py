@@ -149,11 +149,6 @@ class newpassView(APIView):
             if not user.exists():
                 context = {'msg':'user does not exist'}
                 return Response(context, status=status.HTTP_400_BAD_REQUEST)
-            
-            if user[0].password == make_password(pas):
-                context = {'msg':'enter a different password'}
-                return Response(context, status=status.HTTP_400_BAD_REQUEST)
-
 
             if not len(user[0].otp) == 4:
                 context = {'msg':'generate new otp request'}

@@ -3,6 +3,7 @@ from django.utils import timezone
 from django.contrib.auth.models import (
     BaseUserManager, AbstractBaseUser
 )
+from django.core.validators import EmailValidator
 
 class MyUserManager(BaseUserManager):
     def create_user(self, email, name, user_name, password=None, confirm_password=None):
@@ -43,7 +44,8 @@ class MyUserManager(BaseUserManager):
 class NewUserRegistration(AbstractBaseUser):
     email = models.EmailField(verbose_name='email address',
         max_length=255,
-        unique=True,)
+        unique=True,
+        validators=[EmailValidator()])
     name = models.CharField(max_length=150, default=None)
     user_name = models.CharField(max_length=150, blank=True, null=True, default=None, unique=True)
     otp = models.CharField(max_length=4, blank=True, null=True)
