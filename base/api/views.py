@@ -2,12 +2,14 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
+from django.contrib.auth import authenticate
 from django.utils import timezone
 from .serializers import *
 from .mail import *
 from base.models import *
 from datetime import datetime, timedelta
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth.password_validation import validate_password
 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -22,6 +24,15 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
+ 
+ 
+class listOfRegisteredUser(APIView):
+    def get(self, request):
+        users = NewUserRegistration.objects.all()
+        serializer = NewUserSerializer(users, many = True)
+        SerializerData = [serializer.data]
+
+        return Response(SerializerData)
     
 class listOfRegisteredUser(APIView):
      def get(self, request, format = None):
@@ -33,7 +44,7 @@ class listOfRegisteredUser(APIView):
 
 
 
-class NewUserRegistrationView(APIView):
+class NewUserRegistrationView(APIView): 
     def post(self, request, format=None):
         serializer = NewUserSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
@@ -55,9 +66,10 @@ class otp_check(APIView):
             if not query.exists():
                 context = {'msg':'please raise otp first'}
                 return Response(context, status=status.HTTP_400_BAD_REQUEST)
+
             
             userOTP = OTP.objects.get(verifyEmail__iexact = email)
-            
+            print(userOTP.time_created)
             
             user = NewUserRegistration.objects.filter(email = email)
             if not user.exists():
@@ -71,6 +83,7 @@ class otp_check(APIView):
             if not user[0].otp == otp:
                 context = {'msg':'otp is not valid'}
                 return Response(context, status=status.HTTP_400_BAD_REQUEST)
+            
             
             if userOTP.time_created + timedelta(minutes=2) < timezone.now():
                 message = {'msg':'OTP expired'}
@@ -129,8 +142,8 @@ class newpassView(APIView):
         if ser.is_valid(raise_exception=True):
             email = ser.data['email']
             otp = ser.data['otp']
-            pas = ser.data['passwordd']
-            con_pas =ser.data['confirm_passwordd']
+            password = ser.data['passwordd']
+            confirm_password =ser.data['confirm_passwordd']
 
             user = NewUserRegistration.objects.filter(email__iexact = email)
             if not user.exists():
@@ -141,27 +154,30 @@ class newpassView(APIView):
                 context = {'msg':'enter a different password'}
                 return Response(context, status=status.HTTP_400_BAD_REQUEST)
 
+
             if not len(user[0].otp) == 4:
                 context = {'msg':'generate new otp request'}
                 return Response(context, status=status.HTTP_400_BAD_REQUEST)
 
             if not user[0].otp == otp:
                 context = {'msg':'otp is not valid'}
-                return Response(context, status=status.HTTP_400_BAD_REQUEST)   
+                return Response(context, status=status.HTTP_400_BAD_REQUEST)  
+            
+            chkUser = authenticate(email=email, password=password)
+            
+            if chkUser is not None:
+                context = {'msg':'Password entered is same as old one'}
+                return Response(context, status.HTTP_400_BAD_REQUEST)
 
-            if pas == con_pas:
+            if password == confirm_password:
                 user = user.first()
-                if user.password == pas:
-                    context = {'msg':'enter a different password'}
-                    return Response(context, status=status.HTTP_400_BAD_REQUEST)
-                user.password = make_password(pas)
+                user.password = make_password(password)
                 user.is_verified = True
                 user.otp = random.randint(101 , 999)
                 user.save()
+                context = {'msg':'reset Successfull'}
+                return Response(context, status=status.HTTP_200_OK)
             else:
                 context = {'msg':'password and confirm password must be same'}
                 return Response(context, status=status.HTPP_400_BAD_REQUEST)    
             
-
-            context = {'msg':'reset Successfull'}
-            return Response(context, status=status.HTTP_200_OK)
