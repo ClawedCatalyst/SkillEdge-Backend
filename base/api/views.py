@@ -46,7 +46,6 @@ class NewUserRegistrationView(APIView):
 class otp_check(APIView):
     def post(self, request):
         ser = otpcheckserializer(data=request.data)
-        
         if ser.is_valid(raise_exception=True):
             email = ser.data['email']
             otp = ser.data['otp']
@@ -93,6 +92,12 @@ class resend_otp(APIView):
         ser = resetpassserializer(data=request.data)
         if ser.is_valid(raise_exception=True):
             email = ser.data['email']
+
+            user = NewUserRegistration.objects.filter(email = email)
+            if not user.exists():
+                context = {'msg':'user not registered'}
+                return Response(context, status=status.HTTP_400_BAD_REQUEST)
+
             user = NewUserRegistration.objects.get(email = email)
             if user.is_verified == True:
                 context = {'msg':'user already verified'}
