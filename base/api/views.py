@@ -111,9 +111,13 @@ class newpassView(APIView):
             pas = ser.data['passwordd']
             con_pas =ser.data['confirm_passwordd']
 
-            user = NewUserRegistration.objects.filter(email = email)
+            user = NewUserRegistration.objects.filter(email__iexact = email)
             if not user.exists():
                 context = {'msg':'user does not exist'}
+                return Response(context, status=status.HTTP_400_BAD_REQUEST)
+            
+            if user[0].password == make_password(pas):
+                context = {'msg':'enter a different password'}
                 return Response(context, status=status.HTTP_400_BAD_REQUEST)
 
             if not len(user[0].otp) == 4:
@@ -126,10 +130,16 @@ class newpassView(APIView):
 
             if pas == con_pas:
                 user = user.first()
+                if user.password == pas:
+                    context = {'msg':'enter a different password'}
+                    return Response(context, status=status.HTTP_400_BAD_REQUEST)
                 user.password = make_password(pas)
                 user.is_verified = True
                 user.otp = random.randint(101 , 999)
                 user.save()
+            else:
+                context = {'msg':'password and confirm password must be same'}
+                return Response(context, status=status.HTPP_400_BAD_REQUEST)    
             
 
             context = {'msg':'reset Successfull'}
