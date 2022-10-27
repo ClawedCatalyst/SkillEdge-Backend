@@ -1,3 +1,4 @@
+from dataclasses import field
 from base.models import NewUserRegistration
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
@@ -6,7 +7,7 @@ class NewUserSerializer(ModelSerializer):
     confirm_password = serializers.CharField(style={'input_type':'password'}, write_only=True)
     class Meta:
         model = NewUserRegistration
-        fields = ["name", "user_name", "email", "password", "confirm_password", "is_verified"]
+        fields = ["id","name","user_name", "email", "password", "confirm_password", "is_verified"]
         extra_kwargs={
             'password':{'write_only': True}
         }
@@ -22,6 +23,19 @@ class NewUserSerializer(ModelSerializer):
     
     def create(self, validate_data):
         return NewUserRegistration.objects.create_user(**validate_data)
+    
+
+class loginSerializer(ModelSerializer):
+    class Meta:
+        model = NewUserRegistration
+        fields = ["email","password"]
+
+
+class profileSerializer(ModelSerializer):
+    class Meta:
+        model = NewUserRegistration
+        fields = ("name", "user_name", "email","picture", "gender","mobile","is_prime")
+    
 
 class otpcheckserializer(serializers.Serializer):
     email = serializers.EmailField()

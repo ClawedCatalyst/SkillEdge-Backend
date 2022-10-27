@@ -1,3 +1,5 @@
+from distutils.command.upload import upload
+from email.policy import default
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import (
@@ -42,14 +44,27 @@ class MyUserManager(BaseUserManager):
 
 
 class NewUserRegistration(AbstractBaseUser):
+    
+    GENDER = (
+        ('M', 'Male'),
+        ('F', 'Female'),
+        ('O', 'Others')
+    )
+    
     email = models.EmailField(verbose_name='email address',
         max_length=255,
         unique=True,
         validators=[EmailValidator()])
     name = models.CharField(max_length=150, default=None)
     user_name = models.CharField(max_length=150, blank=True, null=True, default=None, unique=True)
+    gender = models.CharField(max_length=1, choices=GENDER, blank=True, null=True)
+    mobile = models.BigIntegerField(blank=True, null=True)
+    picture = models.ImageField(upload_to="images", default="images/defaultProfilePicture.png")
+    
+    
     otp = models.CharField(max_length=4, blank=True, null=True)
 
+    is_prime = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
