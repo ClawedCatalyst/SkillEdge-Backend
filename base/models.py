@@ -67,6 +67,7 @@ class NewUserRegistration(AbstractBaseUser):
     otp = models.CharField(max_length=4, blank=True, null=True)
 
     is_prime = models.BooleanField(default=False)
+    is_educator = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
