@@ -35,7 +35,12 @@ class loginUser(APIView):
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')
-        
+            
+        user = NewUserRegistration.objects.filter(email = email)
+        if not user.exists():
+            context = {'msg':'user with this mail does not exist'}
+            return Response(context, status=status.HTTP_400_BAD_REQUEST)
+
         user = NewUserRegistration.objects.get(email = email)
         if user.is_verified == True :
             user = authenticate(email=email, password=password)
@@ -43,10 +48,11 @@ class loginUser(APIView):
                 token = get_tokens_for_user(user)
                 return Response({'id':user.id,'token': token,'msg':'Login Success'}, status=status.HTTP_200_OK)
             else:
-                return Response({'msg':'Enter correct Email and Password Combinations'}, status=status.HTTP_400_BAD_REQUEST)          
+                return Response({'msg':'Enter correct Password'}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({'msg':'user is not verified'}, status=status.HTTP_400_BAD_REQUEST)
- 
+
+        
 class listOfRegisteredUser(APIView):
     def get(self, request):
         users = NewUserRegistration.objects.all()
