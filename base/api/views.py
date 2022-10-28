@@ -1,8 +1,9 @@
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate
+from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from .serializers import *
 from .mail import *
@@ -11,19 +12,38 @@ from datetime import datetime, timedelta
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.password_validation import validate_password
 
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from rest_framework_simplejwt.views import TokenObtainPairView
+# class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+#     @classmethod
+#     def get_token(cls, user):
+#         token = super().get_token(user)
 
-class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-    @classmethod
-    def get_token(cls, user):
-        token = super().get_token(user)
+#         token['user_name'] = user.user_name
+#         return (token)
 
-        token['user_name'] = user.user_name
-        return (token)
+# class MyTokenObtainPairView(TokenObtainPairView):
+#     serializer_class = MyTokenObtainPairSerializer
 
-class MyTokenObtainPairView(TokenObtainPairView):
-    serializer_class = MyTokenObtainPairSerializer
+def get_tokens_for_user(user):
+    refresh = RefreshToken.for_user(user)
+    return {
+        'refresh': str(refresh),
+        'access': str(refresh.access_token),
+    }
+ 
+ 
+class loginUser(APIView):
+    def post(self, request):
+        email = request.data.get('email')
+        password = request.data.get('password')
+            
+        user = authenticate(email=email, password=password)
+        
+        if user is not None:
+            token = get_tokens_for_user(user)
+            return Response({'id':user.id,'token': token,'msg':'Login Success'}, status=status.HTTP_200_OK)
+        else:
+            return Response({'msg':'Enter correct Email and Password Combinations'}, status=status.HTTP_400_BAD_REQUEST)          
+
  
  
 class listOfRegisteredUser(APIView):
@@ -53,6 +73,37 @@ class NewUserRegistrationView(APIView):
             context = {'msg':'Registration Successfull'}
             return Response(context, status=status.HTTP_200_OK)
         return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
+    
+class profileDetails(APIView):
+        def get(self, request, pk):
+            user = NewUserRegistration.objects.get(id=pk)
+            serializer = profileSerializer(user, many=False)
+            return Response(serializer.data)
+    
+        def put(self, request,pk):
+            user = NewUserRegistration.objects.get(id=pk)
+            serializer = profileSerializer(instance=user, data = request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response({'message':'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
+    
+# @api_view(['POST','GET'])    
+# def profileDetails(request):
+#     email = request.data.get("email")
+#     password = request.data.get("password")
+#     chkUser = authenticate(email=email, password=password)
+    
+#     if chkUser is not None:
+#         user = NewUserRegistration.objects.get(email = email)
+#         serializer = profileSerializer(user, many=False)
+#         return Response(serializer.data)
+#     else:
+#         return Response({'msg':'user does not exits'})
+    
+    
+    
+    
 
 class otp_check(APIView):
     def post(self, request):
