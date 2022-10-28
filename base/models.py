@@ -1,5 +1,6 @@
 from distutils.command.upload import upload
 from email.policy import default
+from locale import normalize
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import (
@@ -16,12 +17,13 @@ class MyUserManager(BaseUserManager):
         if not email:
             raise ValueError('Users must have an email address')
 
+        
+        email = self.normalize_email(email)
         user = self.model(
-            email=self.normalize_email(email),
+            email=email,
             name=name,
             user_name=user_name,
         )
-
         user.set_password(password)
         user.save(using=self._db)
         return user
