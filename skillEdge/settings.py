@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     'base.apps.BaseConfig',
+    'educator.apps.EducatorConfig',
     
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',

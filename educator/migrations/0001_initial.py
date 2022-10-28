@@ -26,10 +26,10 @@ class Migration(migrations.Migration):
                 ('mobile', models.BigIntegerField(blank=True, null=True)),
                 ('picture', models.ImageField(default='images/defaultProfilePicture.png', upload_to='images')),
                 ('otp', models.CharField(blank=True, max_length=4, null=True)),
-                ('is_prime', models.BooleanField(default=False)),
                 ('is_verified', models.BooleanField(default=False)),
                 ('is_active', models.BooleanField(default=True)),
                 ('is_admin', models.BooleanField(default=False)),
+                ('is_educator', models.BooleanField(default=True)),
             ],
             options={
                 'abstract': False,
