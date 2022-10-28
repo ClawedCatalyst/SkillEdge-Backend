@@ -35,16 +35,17 @@ class loginUser(APIView):
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')
-            
-        user = authenticate(email=email, password=password)
         
-        if user is not None:
-            token = get_tokens_for_user(user)
-            return Response({'id':user.id,'token': token,'msg':'Login Success'}, status=status.HTTP_200_OK)
-        else:
-            return Response({'msg':'Enter correct Email and Password Combinations'}, status=status.HTTP_400_BAD_REQUEST)          
+        user = NewUserRegistration.objects.get(email = email)
+        if user.is_verified == True :
+            user = authenticate(email=email, password=password)
+            if user is not None:
+                token = get_tokens_for_user(user)
+                return Response({'id':user.id,'token': token,'msg':'Login Success'}, status=status.HTTP_200_OK)
+            else:
+                return Response({'msg':'Enter correct Email and Password Combinations'}, status=status.HTTP_400_BAD_REQUEST)          
 
- 
+        return Response({'msg':'user is not verified'}, status=status.HTTP_400_BAD_REQUEST)
  
 class listOfRegisteredUser(APIView):
     def get(self, request):
@@ -54,13 +55,13 @@ class listOfRegisteredUser(APIView):
 
         return Response(SerializerData)
     
-class listOfRegisteredUser(APIView):
-     def get(self, request, format = None):
-        users = NewUserRegistration.objects.all()
-        serializer = NewUserSerializer(users, many = True)
-        Serializer_list = [serializer.data]
+# class listOfRegisteredUser(APIView):
+#      def get(self, request, format = None):
+#         users = NewUserRegistration.objects.all()
+#         serializer = NewUserSerializer(users, many = True)
+#         Serializer_list = [serializer.data]
 
-        return Response(Serializer_list)
+#         return Response(Serializer_list)
 
 
 
