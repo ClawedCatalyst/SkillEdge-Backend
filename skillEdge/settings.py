@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'base.apps.BaseConfig',
     'educator.apps.EducatorConfig',
     'courses.apps.CoursesConfig',
+    'wallet.apps.WalletConfig',
     
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',

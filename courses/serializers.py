@@ -5,4 +5,4 @@ from .models import *
 class TopicSerializer(ModelSerializer):
     class Meta:
         model = Course
-        fields = ['category','topic','educator_mail','short_description','thumbnail']
+        fields = ['id','category','topic','educator_mail','short_description','thumbnail','price']

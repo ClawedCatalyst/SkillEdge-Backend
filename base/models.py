@@ -62,7 +62,7 @@ class NewUserRegistration(AbstractBaseUser):
     gender = models.CharField(max_length=1, choices=GENDER, blank=True, null=True)
     mobile = models.BigIntegerField(blank=True, null=True)
     picture = models.ImageField(upload_to="images", default="images/defaultProfilePicture.png")
-    
+    wallet = models.PositiveIntegerField(null=True, blank=False, default=0)
     
     otp = models.CharField(max_length=4, blank=True, null=True)
 
