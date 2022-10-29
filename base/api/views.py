@@ -45,7 +45,7 @@ class loginUser(APIView):
         if user.is_verified == True :
             user = authenticate(email=email, password=password)
             if user is not None:
-                token = get_tokens_for_user(user)
+                token = getTokens(user)
                 return Response({'id':user.id,'token': token,'msg':'Login Success'}, status=status.HTTP_200_OK)
             else:
                 return Response({'msg':'Enter correct Password'}, status=status.HTTP_400_BAD_REQUEST)
