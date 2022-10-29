@@ -23,7 +23,7 @@ from django.contrib.auth.password_validation import validate_password
 # class MyTokenObtainPairView(TokenObtainPairView):
 #     serializer_class = MyTokenObtainPairSerializer
 
-def get_tokens_for_user(user):
+def getTokens(user):
     refresh = RefreshToken.for_user(user)
     return {
         'refresh': str(refresh),
@@ -45,7 +45,7 @@ class loginUser(APIView):
         if user.is_verified == True :
             user = authenticate(email=email, password=password)
             if user is not None:
-                token = get_tokens_for_user(user)
+                token = getTokens(user)
                 return Response({'id':user.id,'token': token,'msg':'Login Success'}, status=status.HTTP_200_OK)
             else:
                 return Response({'msg':'Enter correct Password'}, status=status.HTTP_400_BAD_REQUEST)
@@ -72,7 +72,7 @@ class listOfRegisteredUser(APIView):
 
 
 class NewUserRegistrationView(APIView): 
-    def post(self, request, format=None):
+    def post(self, request,):
         serializer = NewUserSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
