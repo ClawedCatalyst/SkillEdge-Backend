@@ -53,9 +53,9 @@ INSTALLED_APPS = [
 ]
 
 CLOUDINARY_STORAGE = {
-        'CLOUD_NAME': 'do16amngd',
-        'API_KEY': '133674877888865',
-        'API_SECRET': 'tIJCbZAhQWpGog4Vo-N7SVWuGwU'
+        'CLOUD_NAME': os.environ.get('CLOUD_NAME'),
+        'API_KEY': os.environ.get('API_KEY'),
+        'API_SECRET': os.environ.get('API_SECRET')
 }
 
 REST_FRAMEWORK = {
@@ -195,10 +195,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
-# EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
-# EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
-EMAIL_HOST_USER = 'skilledge.contactus@gmail.com'
-EMAIL_HOST_PASSWORD = 'hzpgjxhybnwcemgm'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 CSRF_TRUSTED_ORIGINS = [
