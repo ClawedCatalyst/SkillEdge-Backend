@@ -20,7 +20,7 @@ class BuyCourseView(APIView):
         new_balance = edu_balance + income
         if stu_balance < income :
             amount = income - stu_balance
-            return Response({'message':'low balance. add' , 'amount to be added to buy this course' : amount })
+            return Response({'message':'Low Balance!' , 'Amount to be added to buy this course' : amount })
         stu_new_balance = stu_balance - income
         educator.wallet = new_balance
         student.wallet = stu_new_balance
