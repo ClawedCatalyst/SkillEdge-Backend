@@ -7,23 +7,31 @@ from base.models import *
 
 # Create your views here.
 class BuyCourseView(APIView):
-    def put(self,request,ck):
+    def put(self,request,ck,sk):
         crs = Course.objects.get(id = ck)
+        student = NewUserRegistration.objects.get(id = sk)
         edu = GetEducatorSerializer(crs)
         price = crs.price
         income = 0.85 * price
         edu_mail = crs.educator_mail
         educator = NewUserRegistration.objects.get(email = edu_mail)
-        balance = educator.wallet
-        new_balance = balance + income
+        stu_balance = student.wallet
+        edu_balance = educator.wallet
+        new_balance = edu_balance + income
+        if stu_balance < income :
+            amount = income - stu_balance
+            return Response({'message':'low balance. add' , 'amount to be added to buy this course' : amount })
+        stu_new_balance = stu_balance - income
         educator.wallet = new_balance
+        student.wallet = stu_new_balance
         # student = NewUserRegistration.objects.get(id=sk)
         # return Response(new_balance)
         serializer = WalletSerializer(instance=educator, data = request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data)
-        return Response({'message':'transaction failed'}, status=status.HTTP_400_BAD_REQUEST)
-
-    # def put(self, request, ck):
+        ser = WalletSerializer(instance=student, data = request.data)
+        if ser.is_valid():
+            ser.save()
+            return Response(ser.data)
+        return Response({'message':'transaction failed'})
         
