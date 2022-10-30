@@ -7,7 +7,7 @@ class NewUserSerializer(ModelSerializer):
     confirm_password = serializers.CharField(style={'input_type':'password'}, write_only=True)
     class Meta:
         model = NewUserRegistration
-        fields = ["id","name","user_name", "email", "password", "confirm_password", "is_verified","is_educator"]
+        fields = ["id","name","user_name", "email", "password", "confirm_password", "is_verified","is_educator","wallet"]
         extra_kwargs={
             'password':{'write_only': True}
         }

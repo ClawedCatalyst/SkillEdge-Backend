@@ -5,6 +5,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from base.models import *
 from base.api.serializers import *
+from educator.serializers import *
 
 
 class BecomeEducator(APIView):
