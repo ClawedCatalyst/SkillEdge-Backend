@@ -73,8 +73,10 @@ class NewUserRegistrationView(APIView):
         serializer = NewUserSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            send_otp(serializer.data['email'])
-            context = {'msg':'Registration Successfull'}
+            email = serializer.data['email']
+            send_otp(email)
+            user = NewUserRegistration.objects.get(email=email)
+            context = {'msg':'Registration Successfull', 'id':user.id}
             return Response(context, status=status.HTTP_200_OK)
         return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
     
