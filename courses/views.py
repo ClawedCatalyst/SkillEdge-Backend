@@ -23,4 +23,3 @@ class CourseView(APIView):
                 return Response(serializer.data)    
         else:
             return Response({'msg':'user is not an educator'})    
-            
