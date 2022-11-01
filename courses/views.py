@@ -1,3 +1,4 @@
+from logging import raiseExceptions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import *
@@ -17,9 +18,8 @@ class CourseView(APIView):
         user = NewUserRegistration.objects.get(id=pk)
         if user.is_educator == True:
             serializer = TopicSerializer(data=request.data)
-            if serializer.is_valid():
+            if serializer.is_valid(raise_exception=True):
                 serializer.save()
-                return Response(serializer.data)
+                return Response(serializer.data)    
         else:
             return Response({'msg':'user is not an educator'})    
-            
