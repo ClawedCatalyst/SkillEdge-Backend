@@ -4,13 +4,13 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
+from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
 from .serializers import *
 from .mail import *
 from base.models import *
 from datetime import datetime, timedelta
 from django.contrib.auth.hashers import make_password, check_password
-from django.contrib.auth.password_validation import validate_password
 
 # class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 #     @classmethod
@@ -42,15 +42,12 @@ class loginUser(APIView):
             return Response(context, status=status.HTTP_400_BAD_REQUEST)
 
         user = NewUserRegistration.objects.get(email = email)
-        if user.is_verified == True :
-            user = authenticate(email=email, password=password)
-            if user is not None:
-                token = getTokens(user)
-                return Response({'id':user.id,'token': token,'msg':'Login Success'}, status=status.HTTP_200_OK)
-            else:
-                return Response({'msg':'Enter correct Password'}, status=status.HTTP_400_BAD_REQUEST)
-
-        return Response({'msg':'user is not verified'}, status=status.HTTP_400_BAD_REQUEST)
+        user = authenticate(email=email, password=password)
+        if user is not None:
+            token = getTokens(user)
+            return Response({'id':user.id,'token': token,'msg':'Login Success'}, status=status.HTTP_200_OK)
+        else:
+            return Response({'msg':'Enter correct Password'}, status=status.HTTP_400_BAD_REQUEST)
 
         
 class listOfRegisteredUser(APIView):
@@ -76,19 +73,24 @@ class NewUserRegistrationView(APIView):
         serializer = NewUserSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
-            send_otp(serializer.data['email'])
-            context = {'msg':'Registration Successfull'}
+            email = serializer.data['email']
+            send_otp(email)
+            user = NewUserRegistration.objects.get(email=email)
+            context = {'msg':'Registration Successfull', 'id':user.id}
             return Response(context, status=status.HTTP_200_OK)
         return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
     
 class profileDetails(APIView):
-        def get(self, request, pk):
-            user = NewUserRegistration.objects.get(id=pk)
+        permission_classes = [IsAuthenticated,]
+        def get(self, request):
+            email = request.user.email
+            user = NewUserRegistration.objects.get(email__iexact=email)
             serializer = profileSerializer(user, many=False)
             return Response(serializer.data)
     
-        def put(self, request,pk):
-            user = NewUserRegistration.objects.get(id=pk)
+        def put(self, request):
+            email = request.user.email
+            user = NewUserRegistration.objects.get(email__iexact=email)
             serializer = profileSerializer(instance=user, data = request.data)
             if serializer.is_valid():
                 serializer.save()
