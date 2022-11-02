@@ -1,4 +1,6 @@
+import email
 from logging import raiseExceptions
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import *
@@ -14,8 +16,10 @@ class ViewAllCourses(APIView):
 
 
 class CourseView(APIView):
-    def post(self,request,pk):
-        user = NewUserRegistration.objects.get(id=pk)
+    permission_classes = [IsAuthenticated,]
+    def post(self,request):
+        email = request.user.email
+        user = NewUserRegistration.objects.get(email__iexact=email)
         if user.is_educator == True:
             serializer = TopicSerializer(data=request.data)
             if serializer.is_valid(raise_exception=True):
