@@ -2,7 +2,7 @@ from django.db import models
 # from django.contrib.auth.models import User
 from django.db.models.deletion import CASCADE
 from base.models import *
-from django.core.validators import MaxValueValidator
+from django.core.validators import MaxValueValidator , MinValueValidator
 
 
 # Create your models here.
@@ -25,7 +25,8 @@ class Course(models.Model):
     time_created = models.DateTimeField(auto_now_add=True)
     time_updated = models.DateTimeField(auto_now=True)
     review_count = models.PositiveIntegerField(null=True, default=0)
-    rating = models.PositiveIntegerField(validators=[MaxValueValidator(5)],null=True,blank=False,default=0)
+    latest_review = models.PositiveIntegerField(validators=[MaxValueValidator(5),MinValueValidator(0)],default=0)
+    rating = models.FloatField(validators=[MaxValueValidator(5),MinValueValidator(0)],default=0)
 
     def __str__(self):
         return self.topic

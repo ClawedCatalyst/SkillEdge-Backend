@@ -5,9 +5,11 @@ from .models import *
 class TopicSerializer(ModelSerializer):
     class Meta:
         model = Course
-        fields = ['id','category','topic','educator_mail','short_description','thumbnail','price','rating']
+        fields = ['id','category','topic','educator_mail','short_description','thumbnail','price','rating','review_count','latest_review']
 
 class RatingSerializer(ModelSerializer):
     class Meta:
         model = Course
-        fields = ['rating']
+        fields = ['latest_review']
+
+        extra_kwargs = {'latest_review': {'required': True}}
