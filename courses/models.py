@@ -24,6 +24,8 @@ class Course(models.Model):
     thumbnail = models.ImageField(upload_to="courses/thumbnail", height_field=None, width_field=None, max_length=100, default="")
     time_created = models.DateTimeField(auto_now_add=True)
     time_updated = models.DateTimeField(auto_now=True)
+    review_count = models.PositiveIntegerField(null=True, default=0)
+    rating = models.PositiveIntegerField(validators=[MaxValueValidator(5)],null=True,blank=False,default=0)
 
     def __str__(self):
         return self.topic

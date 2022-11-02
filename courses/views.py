@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import *
 from .models import *
+from base.models import *
 
 
 
@@ -23,3 +24,28 @@ class CourseView(APIView):
                 return Response(serializer.data)    
         else:
             return Response({'msg':'user is not an educator'})    
+
+class CourseRating(APIView):
+    def post(self,request,ck):
+        ser = RatingSerializer(data=request.data)
+        if ser.is_valid(raise_exception=True):
+            course = Course.objects.get(id=ck)
+            count = course.review_count
+            rating = course.rating
+            if count == 0:
+                rating = ser.data['rating']
+                count = 1
+                return Response({'msg':'Thanks for your review'})
+
+            else:
+                present_rating = rating*count
+                new_rating = (present_rating + ser.data['rating'])/(count + 1)
+                count+=1    
+                return Response({'msg':'Thanks for your review'})
+            return Response({'msg':'Something went wrong'})
+        return Response({'msg':'enter valid details'})
+            
+
+
+
+        
