@@ -14,7 +14,7 @@ class category(models.Model):
     time_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.category
+        return str(self.category)
 
 class Course(models.Model):
     category = models.ForeignKey(category, on_delete=models.CASCADE,null=True)  

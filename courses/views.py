@@ -11,16 +11,24 @@ from base.models import *
 
 class AddCategoryUser(APIView):
     permission_classes = [IsAuthenticated,]
-    def put(self,request,pk):
+    def put(self,request):
         email = request.user.email
-        gettingCategory = category.objects.get(id=pk)
         user = NewUserRegistration.objects.get(email__iexact=email)
+        serializer = catSerializer(data=request.data)
+
+        if serializer.is_valid():
+            for i in range(11):
+                s = 'Interest' + str(i+1)
+                if serializer.data[s] == True:
+                    gettingCategory = category.objects.get(id=i + 8)
+                    categories = category(gettingCategory).id
+                    categories.email.add(user.id)
         
-        categories = category(gettingCategory).id
-        categories.email.add(user.id)
+        categories = category.objects.all()
+        serializer = categorySerializer(categories, many=True)
         
+        return Response(serializer.data)
         
-        return Response({'msg':'done'})
 
 
 class ViewAllCategories(APIView):
