@@ -1,4 +1,6 @@
+import email
 from logging import raiseExceptions
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import *
@@ -15,8 +17,10 @@ class ViewAllCourses(APIView):
 
 
 class CourseView(APIView):
-    def post(self,request,pk):
-        user = NewUserRegistration.objects.get(id=pk)
+    permission_classes = [IsAuthenticated,]
+    def post(self,request):
+        email = request.user.email
+        user = NewUserRegistration.objects.get(email__iexact=email)
         if user.is_educator == True:
             serializer = TopicSerializer(data=request.data)
             if serializer.is_valid(raise_exception=True):
@@ -36,8 +40,12 @@ class CourseRating(APIView):
                 review = course.latest_review
                 # return Response(check)
                 if count == 0:
-                    count = 1
-                    rating = course.rating
+                    ser = RatingSerializer(instance = course,data=request.data)
+                    if ser.is_valid(raise_exception=True):
+                        course.rating = review
+                        course.review_count = 1
+                        ser.save()
+                        return Response({'msg':'Thanks for your review'})
                 else:
                     present_rating = rating*count
                     new_rating = (present_rating + review)/(count + 1)
