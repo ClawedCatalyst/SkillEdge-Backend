@@ -16,3 +16,11 @@ class AddcategorySerializer(ModelSerializer):
     class Meta:
         model = category
         fields = ['email']               
+        fields = ['id','category','topic','educator_mail','short_description','thumbnail','price','rating','review_count','latest_review']
+
+class RatingSerializer(ModelSerializer):
+    class Meta:
+        model = Course
+        fields = ['latest_review']
+
+        extra_kwargs = {'latest_review': {'required': True}}
