@@ -9,6 +9,7 @@ from django.core.validators import MaxValueValidator
 
 class category(models.Model):
     category = models.CharField(max_length=50,null=True)
+    email = models.ManyToManyField(NewUserRegistration)
     time_created = models.DateTimeField(auto_now_add=True)
     time_updated = models.DateTimeField(auto_now=True)
 

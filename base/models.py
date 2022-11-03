@@ -62,11 +62,11 @@ class NewUserRegistration(AbstractBaseUser):
     gender = models.CharField(max_length=1, choices=GENDER, blank=True, null=True)
     mobile = models.BigIntegerField(blank=True, null=True)
     picture = models.ImageField(upload_to="images", default="images/defaultProfilePicture.png")
+    dateOfBirth = models.DateField(null=True,blank=True)
     wallet = models.PositiveIntegerField(null=True, blank=False, default=0)
     
     otp = models.CharField(max_length=4, blank=True, null=True)
 
-    is_prime = models.BooleanField(default=False)
     is_educator = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)

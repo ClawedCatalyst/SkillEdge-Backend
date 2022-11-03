@@ -5,5 +5,7 @@ from .views import *
 
 urlpatterns = [
     path('add_course/', CourseView.as_view(), name='addCourse'),
-    path('view_course/', ViewAllCourses.as_view(), name='viewCourse')
+    path('view_course/', ViewAllCourses.as_view(), name='viewCourse'),
+    path('view_category/', ViewAllCategories.as_view(), name='viewCategory'),
+    path('add_category/<str:pk>/', AddCategoryUser.as_view(), name='AddCategory')
 ]
