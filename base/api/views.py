@@ -4,13 +4,13 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate
 from django.contrib.auth.decorators import login_required
+from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
 from .serializers import *
 from .mail import *
 from base.models import *
 from datetime import datetime, timedelta
 from django.contrib.auth.hashers import make_password, check_password
-from django.contrib.auth.password_validation import validate_password
 
 # class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 #     @classmethod
@@ -81,13 +81,16 @@ class NewUserRegistrationView(APIView):
         return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
     
 class profileDetails(APIView):
-        def get(self, request, pk):
-            user = NewUserRegistration.objects.get(id=pk)
+        permission_classes = [IsAuthenticated,]
+        def get(self, request):
+            email = request.user.email
+            user = NewUserRegistration.objects.get(email__iexact=email)
             serializer = profileSerializer(user, many=False)
             return Response(serializer.data)
     
-        def put(self, request,pk):
-            user = NewUserRegistration.objects.get(id=pk)
+        def put(self, request):
+            email = request.user.email
+            user = NewUserRegistration.objects.get(email__iexact=email)
             serializer = profileSerializer(instance=user, data = request.data)
             if serializer.is_valid():
                 serializer.save()

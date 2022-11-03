@@ -9,8 +9,10 @@ from educator.serializers import *
 
 
 class BecomeEducator(APIView):
-    def put(self, request, pk):
-        user = NewUserRegistration.objects.get(id=pk)
+    permission_classes = [IsAuthenticated,]
+    def put(self, request):
+        email = request.user.email
+        user = NewUserRegistration.objects.get(email__iexact=email)
         
         if user.is_verified == True:
             if user.is_educator == False:
