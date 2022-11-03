@@ -145,7 +145,7 @@ DATABASES = {
        'NAME': os.environ.get('DATABASE_NAME'),
        'USER': os.environ.get('DATABASE_USER'),
        'PASSWORD': os.environ.get('DATABASE_PASSWORD'),
-       'HOST': 'ec2-44-195-162-77.compute-1.amazonaws.com',
+       'HOST': os.environ.get('DATABASE_HOST'),
        'PORT': '5432'
    }
 }
