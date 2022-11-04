@@ -1,6 +1,3 @@
-from distutils.command.upload import upload
-from email.policy import default
-from locale import normalize
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import (

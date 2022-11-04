@@ -1,4 +1,4 @@
-import email
+from rest_framework import status
 from logging import raiseExceptions
 from educator import serializers
 from rest_framework.permissions import IsAuthenticated
@@ -23,11 +23,13 @@ class AddCategoryUser(APIView):
                     gettingCategory = category.objects.get(id=i + 8)
                     categories = category(gettingCategory).id
                     categories.email.add(user.id)
+        else:
+            return Response({'msg':'Invalid Entry'}, status=status.HTTP_400_BAD_REQUEST)            
         
         categories = category.objects.all()
         serializer = categorySerializer(categories, many=True)
-        
-        return Response(serializer.data)
+
+        return Response({'msg':'Interests added'},status=status.HTTP_200_OK)
         
 
 
