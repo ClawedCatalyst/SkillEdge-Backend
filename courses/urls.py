@@ -8,6 +8,6 @@ urlpatterns = [
     path('view_course/', ViewAllCourses.as_view(), name='viewCourse'),
     path('view_category/', ViewAllCategories.as_view(), name='viewCategory'),
     path('add_category/', AddCategoryUser.as_view(), name='AddCategory'),
-    path('rate_course/<str:ck>/', CourseRating.as_view(), name='rateCourse'),
+    path('rate_course/', CourseRating.as_view(), name='rateCourse'),
 ]
 

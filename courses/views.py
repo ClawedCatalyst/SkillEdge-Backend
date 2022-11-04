@@ -60,7 +60,7 @@ class CourseView(APIView):
         else:
             return Response({'msg':'user is not an educator'})    
 
-class CourseRating(APIView):
+class CourseRating_calci(APIView):
     def post(self,request,ck):
             course = Course.objects.get(id=ck)
             count = course.review_count
@@ -94,7 +94,12 @@ class CourseRating(APIView):
             #     return Response(rating)
             return Response({'msg':'enter valid details'})
             
-
+class CourseRating(APIView):
+    permission_classes = [IsAuthenticated,]
+    def post(self,request):
+        email = request.user.email
+        user = NewUserRegistration.objects.get(email__iexact=email)
+        ser = GetRatingSerializer(data=request.data)
 
 
         
