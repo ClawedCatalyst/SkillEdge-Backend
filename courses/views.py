@@ -13,6 +13,8 @@ from base.api.serializers import *
 from rest_framework import filters
 from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
+from .pagination import PaginationHandlerMixin
+from rest_framework.pagination import PageNumberPagination
 
 
 class AddCategoryUser(APIView):
@@ -97,19 +99,26 @@ class CourseRating_calci(APIView):
             #     ser.save()
             #     return Response(rating)
             return Response({'msg':'enter valid details'})
-            
+ 
+class BasicPagination(PageNumberPagination):
+    page_size_query_param = 'limit'            
 
-class viewFilteredCourses(APIView):
+class viewFilteredCourses(APIView, PaginationHandlerMixin):
     permission_classes = [IsAuthenticated,]
+    pagination_class = BasicPagination
+    serializer_class = TopicSerializer
     def get(self,request):
         email = request.user.email
         user = NewUserRegistration.objects.get(email__iexact=email)
         array = user.interested.all()
         courses = Course.objects.filter(category__in=array)
         
+        page = self.paginate_queryset(courses)
+        if page is not None:
+            serializer = self.get_paginated_response(self.serializer_class(page,many=True).data)
+        else:
+            serializer = self.serializer_class(courses, many=True)
         
-        
-        serializer = TopicSerializer(courses, many=True)
         return Response(serializer.data)
         
         
