@@ -1,5 +1,6 @@
-import email
+from rest_framework import status
 from logging import raiseExceptions
+from educator import serializers
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -8,6 +9,36 @@ from .models import *
 from base.models import *
 
 
+class AddCategoryUser(APIView):
+    permission_classes = [IsAuthenticated,]
+    def put(self,request):
+        email = request.user.email
+        user = NewUserRegistration.objects.get(email__iexact=email)
+        serializer = catSerializer(data=request.data)
+
+        if serializer.is_valid():
+            for i in range(11):
+                s = 'Interest' + str(i+1)
+                if serializer.data[s] == True:
+                    gettingCategory = category.objects.get(id=i + 8)
+                    categories = category(gettingCategory).id
+                    categories.email.add(user.id)
+        else:
+            return Response({'msg':'Invalid Entry'}, status=status.HTTP_400_BAD_REQUEST)            
+        
+        categories = category.objects.all()
+        serializer = categorySerializer(categories, many=True)
+
+        return Response({'msg':'Interests added'},status=status.HTTP_200_OK)
+        
+
+
+class ViewAllCategories(APIView):
+    def get(self,request):
+        categories = category.objects.all()
+        serializer = categorySerializer(categories, many=True)
+        
+        return Response(serializer.data)
 
 class ViewAllCourses(APIView):
     def get(self,request):

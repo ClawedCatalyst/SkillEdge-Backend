@@ -9,11 +9,12 @@ from django.core.validators import MaxValueValidator , MinValueValidator
 
 class category(models.Model):
     category = models.CharField(max_length=50,null=True)
+    email = models.ManyToManyField(NewUserRegistration)
     time_created = models.DateTimeField(auto_now_add=True)
     time_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.category
+        return str(self.category)
 
 class Course(models.Model):
     category = models.ForeignKey(category, on_delete=models.CASCADE,null=True)  
