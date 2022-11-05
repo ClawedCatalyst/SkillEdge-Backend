@@ -76,7 +76,8 @@ class NewUserRegistrationView(APIView):
             email = serializer.data['email']
             send_otp(email)
             user = NewUserRegistration.objects.get(email=email)
-            context = {'msg':'Registration Successfull', 'id':user.id}
+            token = getTokens(user)
+            context = {'msg':'Registration Successfull', 'token':token}
             return Response(context, status=status.HTTP_200_OK)
         return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
     

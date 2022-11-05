@@ -2,18 +2,19 @@ from django.db import models
 # from django.contrib.auth.models import User
 from django.db.models.deletion import CASCADE
 from base.models import *
-from django.core.validators import MaxValueValidator , MinValueValidator
+from django.core.validators import MaxValueValidator , MinValueValidator , EmailValidator
 
 
 # Create your models here.
 
 class category(models.Model):
     category = models.CharField(max_length=50,null=True)
+    email = models.ManyToManyField(NewUserRegistration)
     time_created = models.DateTimeField(auto_now_add=True)
     time_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.category
+        return str(self.category)
 
 class Course(models.Model):
     category = models.ForeignKey(category, on_delete=models.CASCADE,null=True)  
@@ -40,3 +41,13 @@ class lessons(models.Model):
 
     def __str__(self):
         return self.lessons[0:100]
+
+class feedbackmodel(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE,null=True)
+    latest_review = models.PositiveIntegerField(validators=[MaxValueValidator(5),MinValueValidator(1)],default=0)
+    # user = models.ForeignKey(NewUserRegistration, on_delete=models.CASCADE)
+    comment = models.CharField(max_length=200, null=True, blank=True)
+    time = models.DateTimeField(auto_now_add=True)
+
+    def __int__(self):
+        return self.latest_review
