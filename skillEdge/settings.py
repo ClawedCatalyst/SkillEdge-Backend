@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'wallet.apps.WalletConfig',
     
     'rest_framework',
+    'django_filters',
     'rest_framework_simplejwt.token_blacklist',
     "corsheaders",
     'cloudinary_storage',
@@ -59,7 +60,10 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ),
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ),
 }
 
 SIMPLE_JWT = {

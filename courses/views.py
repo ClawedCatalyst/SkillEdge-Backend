@@ -11,8 +11,8 @@ from .models import *
 from base.models import *
 from base.api.serializers import *
 from rest_framework import filters
-
 from rest_framework import generics
+from django_filters.rest_framework import DjangoFilterBackend
 
 
 class AddCategoryUser(APIView):
@@ -155,10 +155,13 @@ class CourseRating(APIView):
             return Response({'msg':'enter valid details'})
 
 class searching(generics.ListCreateAPIView):
-    search_fields = ['topic','short_description']
-    filter_backends = (filters.SearchFilter,)
+
     queryset = Course.objects.all()
     serializer_class = TopicSerializer
+    search_fields = ['topic','short_description']
+    filter_backends = (filters.SearchFilter,DjangoFilterBackend)
+    filterset_fields = ['category','price']
+     
         
 
         
