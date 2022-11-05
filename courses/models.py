@@ -42,12 +42,12 @@ class lessons(models.Model):
     def __str__(self):
         return self.lessons[0:100]
 
-class Feedback(models.Model):
+class feedbackmodel(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE,null=True)
-    rating = models.PositiveIntegerField(validators=[MaxValueValidator(5),MinValueValidator(1)],default=0)
-    user = models.ManyToManyField(NewUserRegistration)
+    latest_review = models.PositiveIntegerField(validators=[MaxValueValidator(5),MinValueValidator(1)],default=0)
+    # user = models.ForeignKey(NewUserRegistration, on_delete=models.CASCADE)
     comment = models.CharField(max_length=200, null=True, blank=True)
     time = models.DateTimeField(auto_now_add=True)
 
     def __int__(self):
-        return self.rating
+        return self.latest_review

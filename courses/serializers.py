@@ -28,10 +28,10 @@ class RatingSerializer(ModelSerializer):
 
 class GetRatingSerializer(ModelSerializer):
     class Meta:
-        model = Feedback
-        fields = ['course','rating','comment','user']
+        model = feedbackmodel
+        fields = ['course','latest_review','comment']
 
-        extra_kwargs = {'rating': {'required': True}}
+        extra_kwargs = {'course': {'required': True}}
 
 class catSerializer(serializers.Serializer):
     Interest1 = serializers.BooleanField()
