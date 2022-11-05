@@ -19,7 +19,7 @@ class AddCategoryUser(APIView):
         serializer = catSerializer(data=request.data)
 
         if serializer.is_valid():
-            for i in range(3):
+            for i in range(11):
                 s = 'Interest' + str(i+1)
                 if serializer.data[s] == True:
                     gettingCategory = interests.objects.get(id=i + 1)
