@@ -237,3 +237,14 @@ class newpassView(APIView):
                 context = {'msg':'password and confirm password must be same'}
                 return Response(context, status=status.HTPP_400_BAD_REQUEST)    
             
+class Verifycheck(APIView):
+        permission_classes = [IsAuthenticated,]
+        def get(self, request):
+            email = request.user.email
+            user = NewUserRegistration.objects.get(email__iexact=email)
+            if user.is_verified == True:
+                context = {'msg':'User is verified'}
+                return Response(context, status=status.HTTP_200_OK)
+            else:
+                context = {'msg':'User is not verified'}
+                return Response(context, status=status.HTTP_400_BAD_REQUEST)
