@@ -1,3 +1,4 @@
+from unicodedata import category
 from rest_framework import status
 from logging import raiseExceptions
 from educator import serializers
@@ -7,6 +8,7 @@ from rest_framework.views import APIView
 from .serializers import *
 from .models import *
 from base.models import *
+from base.api.serializers import *
 
 
 class AddCategoryUser(APIView):
@@ -17,25 +19,23 @@ class AddCategoryUser(APIView):
         serializer = catSerializer(data=request.data)
 
         if serializer.is_valid():
-            for i in range(11):
+            for i in range(3):
                 s = 'Interest' + str(i+1)
                 if serializer.data[s] == True:
-                    gettingCategory = category.objects.get(id=i + 8)
-                    categories = category(gettingCategory).id
-                    categories.email.add(user.id)
+                    gettingCategory = interests.objects.get(id=i + 1)
+                    user.interested.add(gettingCategory)
         else:
             return Response({'msg':'Invalid Entry'}, status=status.HTTP_400_BAD_REQUEST)            
         
-        categories = category.objects.all()
-        serializer = categorySerializer(categories, many=True)
+        serializer = profileSerializer(user, many=False)
 
-        return Response({'msg':'Interests added'},status=status.HTTP_200_OK)
+        return Response(serializer.data)
         
 
 
 class ViewAllCategories(APIView):
     def get(self,request):
-        categories = category.objects.all()
+        categories = interests.objects.all()
         serializer = categorySerializer(categories, many=True)
         
         return Response(serializer.data)
@@ -95,6 +95,19 @@ class CourseRating(APIView):
             return Response({'msg':'enter valid details'})
             
 
-
+class viewFilteredCourses(APIView):
+    permission_classes = [IsAuthenticated,]
+    def get(self,request):
+        email = request.user.email
+        user = NewUserRegistration.objects.get(email__iexact=email)
+        array = user.interested.all()
+        courses = Course.objects.filter(category__in=array)
+        
+        
+        
+        serializer = TopicSerializer(courses, many=True)
+        return Response(serializer.data)
+        
+        
 
         

@@ -9,5 +9,6 @@ urlpatterns = [
     path('view_category/', ViewAllCategories.as_view(), name='viewCategory'),
     path('add_category/', AddCategoryUser.as_view(), name='AddCategory'),
     path('rate_course/<str:ck>/', CourseRating.as_view(), name='rateCourse'),
+    path('view_filtered_courses/', viewFilteredCourses.as_view(), name='viewFilteredCourses')
 ]
 
