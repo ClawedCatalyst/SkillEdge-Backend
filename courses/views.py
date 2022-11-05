@@ -1,3 +1,4 @@
+from re import search
 from unicodedata import category
 from rest_framework import status
 from logging import raiseExceptions
@@ -9,6 +10,9 @@ from .serializers import *
 from .models import *
 from base.models import *
 from base.api.serializers import *
+from rest_framework import filters
+
+from rest_framework import generics
 
 
 class AddCategoryUser(APIView):
@@ -150,5 +154,11 @@ class CourseRating(APIView):
             #     return Response(rating)
             return Response({'msg':'enter valid details'})
 
+class searching(generics.ListCreateAPIView):
+    search_fields = ['topic','short_description']
+    filter_backends = (filters.SearchFilter,)
+    queryset = Course.objects.all()
+    serializer_class = TopicSerializer
+        
 
         

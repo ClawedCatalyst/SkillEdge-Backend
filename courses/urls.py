@@ -10,5 +10,6 @@ urlpatterns = [
     path('add_category/', AddCategoryUser.as_view(), name='AddCategory'),
     path('view_filtered_courses/', viewFilteredCourses.as_view(), name='viewFilteredCourses'),
     path('rate_course/', CourseRating.as_view(), name='rateCourse'),
+    path('search_course/', searching.as_view(), name='searchCourse')
 ]
 
