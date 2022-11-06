@@ -5,7 +5,6 @@ from django.db.models.deletion import CASCADE
 from base.models import *
 from django.core.validators import MaxValueValidator , MinValueValidator , EmailValidator
 
-
 # Create your models here.
 
 class Course(models.Model):
