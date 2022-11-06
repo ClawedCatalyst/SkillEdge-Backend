@@ -17,6 +17,4 @@ class cartadd(APIView):
         ser = CartSerializer(data=request.data)
         if ser.is_valid(raise_exception=True):
             ser.save()
-            ser.student = email
-            ser.save()
             return Response({'msg':'course added successfully to cart'})

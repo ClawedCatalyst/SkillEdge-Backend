@@ -12,6 +12,7 @@ class Course(models.Model):
     category = models.ForeignKey(interests, on_delete=models.CASCADE,null=True)  
     topic = models.CharField(max_length=200)
     educator_mail = models.ForeignKey(NewUserRegistration, on_delete=models.CASCADE)
+    educator_name = models.CharField(max_length=100, null=True)
     price = models.PositiveIntegerField(validators=[MaxValueValidator(999)],null=True, blank=False)
     short_description = models.CharField(max_length=200, null=True, blank=True)
     thumbnail = models.ImageField(upload_to="courses/thumbnail", height_field=None, width_field=None, max_length=100, default="")
