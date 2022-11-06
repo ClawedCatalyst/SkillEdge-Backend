@@ -27,12 +27,12 @@ class RatingSerializer(ModelSerializer):
 
         extra_kwargs = {'latest_review': {'required': True}}
 
-class GetRatingSerializer(ModelSerializer):
-    class Meta:
-        model = feedbackmodel
-        fields = ['course','latest_review','comment']
+# class GetRatingSerializer(ModelSerializer):
+#     class Meta:
+#         model = feedback
+#         fields = ['course','latest_review','comment']
 
-        extra_kwargs = {'course': {'required': True}}
+#         extra_kwargs = {'course': {'required': True}}
 
 class catSerializer(serializers.Serializer):
     Interest1 = serializers.BooleanField()
