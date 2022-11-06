@@ -2,6 +2,7 @@ from dataclasses import field
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 from .models import *
+from base.models import *
 
 class TopicSerializer(ModelSerializer):
     class Meta:
@@ -10,12 +11,12 @@ class TopicSerializer(ModelSerializer):
         
 class categorySerializer(ModelSerializer):
     class Meta:
-        model = category 
-        fields = ['id','category','email']
+        model = interests 
+        fields = ['id','interest']
         
 class AddcategorySerializer(ModelSerializer):
     class Meta:
-        model = category
+        model = interests
         fields = ['email']               
         fields = ['id','category','topic','educator_mail','short_description','thumbnail','price','rating','review_count','latest_review']
 

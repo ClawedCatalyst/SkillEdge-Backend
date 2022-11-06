@@ -18,5 +18,6 @@ urlpatterns = [
     path('reset_password/', resetpassView.as_view(), name='resetpass'),
     path('enter_new_password/', newpassView.as_view(), name='newpass'),
     path('list_of_registered_users/',listOfRegisteredUser.as_view(), name='listOfRegisteredUser'),
-    path('profile_details/',profileDetails.as_view(), name='profileDetails')
+    path('profile_details/',profileDetails.as_view(), name='profileDetails'),
+    path('Verifycheck/',Verifycheck.as_view(), name='Verifycheck')
 ]

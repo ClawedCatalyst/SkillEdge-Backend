@@ -41,8 +41,10 @@ INSTALLED_APPS = [
     'educator.apps.EducatorConfig',
     'courses.apps.CoursesConfig',
     'wallet.apps.WalletConfig',
+    'cart.apps.CartConfig',
     
     'rest_framework',
+    'django_filters',
     'rest_framework_simplejwt.token_blacklist',
     "corsheaders",
     'cloudinary_storage',
@@ -59,7 +61,12 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
+    ),
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ),
+     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
 }
 
 SIMPLE_JWT = {
@@ -145,7 +152,7 @@ DATABASES = {
        'NAME': os.environ.get('DATABASE_NAME'),
        'USER': os.environ.get('DATABASE_USER'),
        'PASSWORD': os.environ.get('DATABASE_PASSWORD'),
-       'HOST': os.environ.get('DATABASE_HOST'),
+       'HOST': 'ec2-44-195-162-77.compute-1.amazonaws.com',
        'PORT': '5432'
    }
 }
