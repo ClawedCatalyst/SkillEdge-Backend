@@ -60,7 +60,7 @@ class CourseView(APIView):
         else:
             return Response({'msg':'user is not an educator'})    
 
-class CourseRating(APIView):
+class CourseRating_calci(APIView):
     def post(self,request,ck):
             course = Course.objects.get(id=ck)
             count = course.review_count
@@ -94,7 +94,46 @@ class CourseRating(APIView):
             #     return Response(rating)
             return Response({'msg':'enter valid details'})
             
-
+class CourseRating(APIView):
+    permission_classes = [IsAuthenticated,]
+    def post(self,request):
+        email = request.user.email
+        user = NewUserRegistration.objects.get(email__iexact=email)
+        seri = GetRatingSerializer(data=request.data)
+        if seri.is_valid(raise_exception=True):
+            seri.save()
+            ck = feedbackmodel.objects.latest('time')
+            course=ck.course
+            count = course.review_count
+            rating = course.rating
+            ser = RatingSerializer(instance = course,data=request.data)
+            if ser.is_valid(raise_exception=True):
+                ser.save()
+                review = course.latest_review
+                # return Response(check)
+                if count == 0:
+                    ser = RatingSerializer(instance = course,data=request.data)
+                    if ser.is_valid(raise_exception=True):
+                        course.rating = review
+                        course.review_count = 1
+                        ser.save()
+                        return Response({'msg':'Thanks for your review'})
+                else:
+                    present_rating = rating*count
+                    new_rating = (present_rating + review)/(count + 1)
+                    count+=1
+                    course.review_count = count
+                    ser = RatingSerializer(instance = course,data=request.data)
+                    if ser.is_valid(raise_exception=True):
+                        course.rating = new_rating
+                        ser.save()
+                        return Response({'msg':'Thanks for your review'})
+                return Response({'msg':'Something went wrong'})
+            # ser = RatingSerializer(instance = course,data=request.data)
+            # if ser.is_valid(raise_exception=True):
+            #     ser.save()
+            #     return Response(rating)
+            return Response({'msg':'enter valid details'})
 
 
         
