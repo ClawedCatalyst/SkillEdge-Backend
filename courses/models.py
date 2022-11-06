@@ -5,6 +5,7 @@ from django.db.models.deletion import CASCADE
 from base.models import *
 from django.core.validators import MaxValueValidator , MinValueValidator , EmailValidator
 
+
 # Create your models here.
 
 class Course(models.Model):
@@ -33,12 +34,12 @@ class lessons(models.Model):
     def __str__(self):
         return self.lessons[0:100]
 
-# class feedback(models.Model):
-#     course = models.ForeignKey(Course, on_delete=models.CASCADE,null=True)
-#     latest_review = models.PositiveIntegerField(validators=[MaxValueValidator(5),MinValueValidator(1)],default=0)
-#     #user = models.ForeignKey(NewUserRegistration, on_delete=models.CASCADE)
-#     comment = models.CharField(max_length=200, null=True, blank=True)
-#     time = models.DateTimeField(auto_now_add=True)
+class feedbackmodel(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE,null=True)
+    latest_review = models.PositiveIntegerField(validators=[MaxValueValidator(5),MinValueValidator(1)],default=0)
+    # user = models.ForeignKey(NewUserRegistration, on_delete=models.CASCADE)
+    comment = models.CharField(max_length=100, null=True, blank=True)
+    time = models.DateTimeField(auto_now_add=True)
 
-#     def __str__(self):
-#         return self.course.topic
+    def __str__(self):
+        return self.course.topic + " [" + self.comment[0:20] + "] "
