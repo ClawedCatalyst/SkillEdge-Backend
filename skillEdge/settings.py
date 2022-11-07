@@ -15,6 +15,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 from datetime import timedelta
 import os
 
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
@@ -219,3 +222,10 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+# DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.VideoMediaCloudinaryStorage'
+
+cloudinary.config( 
+  cloud_name =os.environ.get('CLOUD_NAME'), 
+  api_key = os.environ.get('API_KEY'), 
+  api_secret = os.environ.get('API_SECRET'),
+)
