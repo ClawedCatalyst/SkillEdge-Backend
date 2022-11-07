@@ -5,6 +5,10 @@ from django.db.models.deletion import CASCADE
 from base.models import *
 from django.core.validators import MaxValueValidator , MinValueValidator , EmailValidator
 
+# from cloudinary_storage.validators import validate_video
+from cloudinary.models import CloudinaryField
+
+
 
 # Create your models here.
 
@@ -29,11 +33,12 @@ class lessons(models.Model):
     
     topic = models.ForeignKey(Course, on_delete=models.CASCADE)
     description = models.TextField(max_length=2000)
+    lesson = CloudinaryField(resource_type='video', null=True)
     time = models.DateTimeField(auto_now_add=True)
     time_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.lessons[0:100]
+        return str(self.topic)
 
 class feedbackmodel(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE,null=True)

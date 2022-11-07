@@ -46,3 +46,8 @@ class catSerializer(serializers.Serializer):
     Interest9 = serializers.BooleanField()
     Interest10 = serializers.BooleanField()
     Interest11 = serializers.BooleanField()
+    
+class lessonSerializer(ModelSerializer):
+    class Meta:
+        model = lessons
+        fields = ['topic','description','lesson']    

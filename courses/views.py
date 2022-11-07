@@ -168,12 +168,30 @@ class CourseRating(APIView):
 
 class searching(generics.ListCreateAPIView):
 
+    filter_backends = (filters.SearchFilter,DjangoFilterBackend)
+    filterset_fields = ['category','price','topic']
+    search_fields = ['topic','short_description']
     queryset = Course.objects.all()
     serializer_class = TopicSerializer
-    search_fields = ['topic','short_description']
-    filter_backends = (filters.SearchFilter,DjangoFilterBackend)
-    filterset_fields = ['category','price']
-     
-        
 
+class addLessonView(APIView):
+    permission_classes = [IsAuthenticated,]
+    def post(self,request):
+        email = request.user.email
+        user = NewUserRegistration.objects.get(email__iexact=email)
+        
+        if user.is_educator == True:
+            serializer = lessonSerializer(data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response(serializer.data)    
+        else:
+            return Response({'msg':'user is not an educator'}) 
+ 
+class viewLesson(APIView):
+    def get(self,request):
+        lesson = lessons.objects.all()
+        serializer = lessonSerializer(lesson, many=True)
+        
+        return Response(serializer.data)        
         
