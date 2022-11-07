@@ -34,7 +34,7 @@ class loginSerializer(ModelSerializer):
 class profileSerializer(ModelSerializer):
     class Meta:
         model = NewUserRegistration
-        fields = ("name", "user_name" ,"picture", "gender","dateOfBirth","mobile","is_educator")
+        fields = ("name", "user_name" ,"picture", "gender","dateOfBirth","mobile","is_educator","email","interested")
     
 
 class otpcheckserializer(serializers.Serializer):
