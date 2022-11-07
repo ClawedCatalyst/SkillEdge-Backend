@@ -8,6 +8,10 @@ urlpatterns = [
     path('view_course/', ViewAllCourses.as_view(), name='viewCourse'),
     path('view_category/', ViewAllCategories.as_view(), name='viewCategory'),
     path('add_category/', AddCategoryUser.as_view(), name='AddCategory'),
+    path('view_filtered_courses/', viewFilteredCourses.as_view(), name='viewFilteredCourses'),
     path('rate_course/', CourseRating.as_view(), name='rateCourse'),
+    path('search_course/', searching.as_view(), name='searchCourse'),
+    path('add_lesson/', addLessonView.as_view(), name='addLessonView'),
+    path('view_lesson/', viewLesson.as_view(), name='viewLesson')
 ]
 

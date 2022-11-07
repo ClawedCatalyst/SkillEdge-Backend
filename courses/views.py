@@ -1,3 +1,5 @@
+from re import search
+from unicodedata import category
 from rest_framework import status
 from logging import raiseExceptions
 from educator import serializers
@@ -7,6 +9,12 @@ from rest_framework.views import APIView
 from .serializers import *
 from .models import *
 from base.models import *
+from base.api.serializers import *
+from rest_framework import filters
+from rest_framework import generics
+from django_filters.rest_framework import DjangoFilterBackend
+from .pagination import PaginationHandlerMixin
+from rest_framework.pagination import PageNumberPagination
 
 
 class AddCategoryUser(APIView):
@@ -20,22 +28,20 @@ class AddCategoryUser(APIView):
             for i in range(11):
                 s = 'Interest' + str(i+1)
                 if serializer.data[s] == True:
-                    gettingCategory = category.objects.get(id=i + 8)
-                    categories = category(gettingCategory).id
-                    categories.email.add(user.id)
+                    gettingCategory = interests.objects.get(id=i + 1)
+                    user.interested.add(gettingCategory)
         else:
             return Response({'msg':'Invalid Entry'}, status=status.HTTP_400_BAD_REQUEST)            
         
-        categories = category.objects.all()
-        serializer = categorySerializer(categories, many=True)
+        serializer = profileSerializer(user, many=False)
 
-        return Response({'msg':'Interests added'},status=status.HTTP_200_OK)
+        return Response(serializer.data)
         
 
 
 class ViewAllCategories(APIView):
     def get(self,request):
-        categories = category.objects.all()
+        categories = interests.objects.all()
         serializer = categorySerializer(categories, many=True)
         
         return Response(serializer.data)
@@ -93,7 +99,29 @@ class CourseRating_calci(APIView):
             #     ser.save()
             #     return Response(rating)
             return Response({'msg':'enter valid details'})
-            
+ 
+class BasicPagination(PageNumberPagination):
+    page_size_query_param = 'limit'            
+
+class viewFilteredCourses(APIView, PaginationHandlerMixin):
+    permission_classes = [IsAuthenticated,]
+    pagination_class = BasicPagination
+    serializer_class = TopicSerializer
+    def get(self,request):
+        email = request.user.email
+        user = NewUserRegistration.objects.get(email__iexact=email)
+        array = user.interested.all()
+        courses = Course.objects.filter(category__in=array)
+        
+        page = self.paginate_queryset(courses)
+        if page is not None:
+            serializer = self.get_paginated_response(self.serializer_class(page,many=True).data)
+        else:
+            serializer = self.serializer_class(courses, many=True)
+        
+        return Response(serializer.data)
+        
+        
 class CourseRating(APIView):
     permission_classes = [IsAuthenticated,]
     def post(self,request):
@@ -135,5 +163,32 @@ class CourseRating(APIView):
             #     return Response(rating)
             return Response({'msg':'enter valid details'})
 
+class searching(generics.ListCreateAPIView):
 
+    filter_backends = (filters.SearchFilter,DjangoFilterBackend)
+    filterset_fields = ['category','price','topic']
+    search_fields = ['topic','short_description']
+    queryset = Course.objects.all()
+    serializer_class = TopicSerializer
+
+class addLessonView(APIView):
+    permission_classes = [IsAuthenticated,]
+    def post(self,request):
+        email = request.user.email
+        user = NewUserRegistration.objects.get(email__iexact=email)
+        
+        if user.is_educator == True:
+            serializer = lessonSerializer(data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response(serializer.data)    
+        else:
+            return Response({'msg':'user is not an educator'}) 
+ 
+class viewLesson(APIView):
+    def get(self,request):
+        lesson = lessons.objects.all()
+        serializer = lessonSerializer(lesson, many=True)
+        
+        return Response(serializer.data)        
         

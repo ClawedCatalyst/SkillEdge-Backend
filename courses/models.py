@@ -1,23 +1,19 @@
+import imp
 from django.db import models
 # from django.contrib.auth.models import User
 from django.db.models.deletion import CASCADE
 from base.models import *
 from django.core.validators import MaxValueValidator , MinValueValidator , EmailValidator
 
+# from cloudinary_storage.validators import validate_video
+from cloudinary.models import CloudinaryField
+
+
 
 # Create your models here.
 
-class category(models.Model):
-    category = models.CharField(max_length=50,null=True)
-    email = models.ManyToManyField(NewUserRegistration)
-    time_created = models.DateTimeField(auto_now_add=True)
-    time_updated = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return str(self.category)
-
 class Course(models.Model):
-    category = models.ForeignKey(category, on_delete=models.CASCADE,null=True)  
+    category = models.ForeignKey(interests, on_delete=models.CASCADE,null=True)  
     topic = models.CharField(max_length=200)
     educator_mail = models.ForeignKey(NewUserRegistration, on_delete=models.CASCADE)
     price = models.PositiveIntegerField(validators=[MaxValueValidator(999)],null=True, blank=False)
@@ -36,18 +32,19 @@ class lessons(models.Model):
     
     topic = models.ForeignKey(Course, on_delete=models.CASCADE)
     description = models.TextField(max_length=2000)
+    lesson = CloudinaryField(resource_type='video', null=True)
     time = models.DateTimeField(auto_now_add=True)
     time_updated = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.lessons[0:100]
+        return str(self.topic)
 
 class feedbackmodel(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE,null=True)
     latest_review = models.PositiveIntegerField(validators=[MaxValueValidator(5),MinValueValidator(1)],default=0)
     # user = models.ForeignKey(NewUserRegistration, on_delete=models.CASCADE)
-    comment = models.CharField(max_length=200, null=True, blank=True)
+    comment = models.CharField(max_length=100, null=True, blank=True)
     time = models.DateTimeField(auto_now_add=True)
 
-    def __int__(self):
-        return self.latest_review
+    def __str__(self):
+        return self.course.topic + " [" + self.comment[0:20] + "] "
