@@ -206,14 +206,16 @@ class LessonView(APIView):
     def post(self,request):
         email = request.user.email
         user = NewUserRegistration.objects.get(email__iexact=email)
-        
-        if user.is_educator == True:
-            serializer = lessonSerializer(data=request.data)
-            if serializer.is_valid(raise_exception=True):
-                serializer.save()
-                return Response(serializer.data)    
-        else:
-            return Response({'msg':'user is not an educator'}) 
+        try:
+            if user.is_educator == True:
+                serializer = lessonSerializer(data=request.data)
+                if serializer.is_valid(raise_exception=True):
+                    serializer.save()
+                    return Response(serializer.data)    
+            else:
+                return Response({'msg':'user is not an educator'})
+        except:
+            return Response({'msg':'invalid'})     
         
     
 class viewSpecificCourseLesson(APIView):
