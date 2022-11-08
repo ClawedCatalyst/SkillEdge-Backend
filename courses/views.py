@@ -62,6 +62,9 @@ class CourseView(APIView):
             serializer = TopicSerializer(data=request.data)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
+                ck = Course.objects.latest('time_created')
+                ck.educator_name = user.name
+                ck.save()
                 return Response(serializer.data)    
         else:
             return Response({'msg':'user is not an educator'})    

@@ -12,7 +12,7 @@ class cart(models.Model):
     student = models.ForeignKey(NewUserRegistration, on_delete=models.CASCADE,null=True)
     total_price = models.PositiveIntegerField(default=0)
 
-    def __str__(self):
+    def __int__(self):
         return self.student.email + " [" + str(self.total_price) + "] "
 
 
@@ -30,7 +30,8 @@ def addcourse(sender, **kwargs):
     cart_item = kwargs['instance']
     course = Course.objects.get(id=cart_item.course.id)
     cart_item.price = course.price
-    cart_v = cart.objects.get(id = cart_item.cart.id)
+    pk = cart_item.cart.id
+    cart_v = cart.objects.get(id = pk)
     cart_tp = cart_v.total_price
     cart_v.total_price = course.price + cart_tp
     cart_v.save()
