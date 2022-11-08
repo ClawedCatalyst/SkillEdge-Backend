@@ -9,21 +9,23 @@ from django.db.models.signals import pre_save,post_save
 from django.dispatch import receiver
 
 class cart(models.Model):
-    student = models.ForeignKey(NewUserRegistration, on_delete=models.CASCADE,null=True)
+    student_mail = models.EmailField(verbose_name='email address',
+        max_length=255,
+        unique=True,
+        validators=[EmailValidator()],null = True)
     total_price = models.PositiveIntegerField(default=0)
 
-    def __int__(self):
-        return self.student.email + " [" + str(self.total_price) + "] "
+    def __str__(self):
+        return self.student_mail + " [" + str(self.total_price) + "] "
 
 
 class cart_courses(models.Model):
     cart = models.ForeignKey(cart, on_delete=models.CASCADE,null=True)
-    student = models.ForeignKey(NewUserRegistration, on_delete=models.CASCADE,null=True)
     course = models.ForeignKey(Course, on_delete=models.CASCADE,null=True)
     price = models.PositiveIntegerField(validators=[MaxValueValidator(999)],default = 0)
 
     def __str__(self):
-        return self.student.email + " [" + self.course.topic + "] "
+        return self.cart.student_mail + " [" + self.course.topic + "] "
 
 @receiver(pre_save, sender = cart_courses)
 def addcourse(sender, **kwargs):
@@ -35,5 +37,5 @@ def addcourse(sender, **kwargs):
     cart_tp = cart_v.total_price
     cart_v.total_price = course.price + cart_tp
     cart_v.save()
-    # print(cart_item)
+    #print(cart_item)
     
