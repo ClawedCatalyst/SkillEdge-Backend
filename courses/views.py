@@ -156,7 +156,6 @@ class searching(APIView):
     
     
     
-    serializer_class = TopicSerializer
 
 class LessonView(APIView):
     permission_classes = [IsAuthenticated,]
