@@ -50,6 +50,7 @@ class ViewAllCategories(APIView):
 class ViewAllCourses(APIView):
     def get(self,request):
         data = Course.objects.all()
+        data = Course.objects.order_by('-rating')
         serializer = TopicSerializer(data, many=True)
         return Response(serializer.data)
 
@@ -83,6 +84,7 @@ class viewFilteredCourses(APIView, PaginationHandlerMixin):
         array = user.interested.all()
         courses = Course.objects.filter(category__in=array)
         
+        courses = Course.objects.order_by('-rating')
         page = self.paginate_queryset(courses)
         if page is not None:
             serializer = self.get_paginated_response(self.serializer_class(page,many=True).data)
@@ -147,6 +149,9 @@ class searching(APIView):
             
         serializer = TopicSerializer(queryset, many=True)
         
+        if serializer.data == []:
+            return Response({'msg':'Nothing Found'}, status=status.HTTP_400_BAD_REQUEST)
+        
         return Response(serializer.data)  
     
     
@@ -167,14 +172,16 @@ class LessonView(APIView):
     def post(self,request):
         email = request.user.email
         user = NewUserRegistration.objects.get(email__iexact=email)
-        
-        if user.is_educator == True:
-            serializer = lessonSerializer(data=request.data)
-            if serializer.is_valid(raise_exception=True):
-                serializer.save()
-                return Response(serializer.data)    
-        else:
-            return Response({'msg':'user is not an educator'}) 
+        try:
+            if user.is_educator == True:
+                serializer = lessonSerializer(data=request.data)
+                if serializer.is_valid(raise_exception=True):
+                    serializer.save()
+                    return Response(serializer.data)    
+            else:
+                return Response({'msg':'user is not an educator'})
+        except:
+            return Response({'msg':'invalid'})     
         
     
 class viewSpecificCourseLesson(APIView):
@@ -183,9 +190,11 @@ class viewSpecificCourseLesson(APIView):
             topic = request.data.get("topic")
             lesson = lessons.objects.filter(topic=topic)
             serializer = lessonSerializer(lesson, many=True)
+            if serializer.data == []:
+                return Response({"msg":"No such course exists"},status=status.HTTP_400_BAD_REQUEST)
             return Response(serializer.data)
         except:
-            return Response({"msg":"Enter a valid course"})  
+            return Response({"msg":"Enter a valid course"}, status=status.HTTP_400_BAD_REQUEST)  
             
              
         
