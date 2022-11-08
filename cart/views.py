@@ -9,12 +9,27 @@ from .models import *
 from base.models import *
 
 # Create your views here.
+class createcart(APIView):
+    def post(self,request):
+        ser = CartSerializer(data=request.data)
+        if ser.is_valid(raise_exception=True):
+            ser.save()
+            return Response({'msg':'cart added successfully'})
+            
+class cartid(APIView):
+    permission_classes = [IsAuthenticated,]
+    def get(self,request):
+        email = request.user.email
+        cart_details = cart.objects.get(student_mail__iexact =email)
+        cart_id = cart_details.id
+        return Response(cart_id)
+
 class cartadd(APIView):
     permission_classes = [IsAuthenticated,]
     def put(self,request):
         email = request.user.email
         user = NewUserRegistration.objects.get(email__iexact=email)
-        ser = CartSerializer(data=request.data)
+        ser = AddCartSerializer(data=request.data)
         if ser.is_valid(raise_exception=True):
             ser.save()
             return Response({'msg':'course added successfully to cart'})

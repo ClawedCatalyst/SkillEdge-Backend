@@ -6,8 +6,16 @@ from base.models import *
 
 class CartSerializer(ModelSerializer):
     class Meta:
-        model = cart_courses
-        fields = ['cart','student','course']
+        model = cart
+        fields = ['student_mail']
 
-        extra_kwargs = {'course': {'required': True}}
+        extra_kwargs = {'student_mail': {'required': True}}
+        
+
+class AddCartSerializer(ModelSerializer):
+    class Meta:
+        model = cart_courses
+        fields = ['cart','course']
+
+        extra_kwargs = {'course': {'required': True},'cart': {'required': True} }
         
