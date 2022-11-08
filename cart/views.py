@@ -32,12 +32,20 @@ class cartadd(APIView):
         user = NewUserRegistration.objects.get(email__iexact=email)
         ser = AddCartSerializer(data=request.data)
         if ser.is_valid(raise_exception=True):
-            ser.save()
-            return Response({'msg':'course added successfully to cart'})
+            # data =request.data
+            cart=request.data.get("cart")
+            course=request.data.get("course")
+            cart_course = cart_courses.objects.filter(cart=cart,course=course)
+            l = len(cart_course)
+            if l == 0:
+                ser.save()
+                return Response({'msg':'course added successfully to cart'})
+            else:
+                return Response({'msg':'course already added to cart'})
 
 class cartremove(APIView):
     permission_classes = [IsAuthenticated,]
-    def post(self,request,ck):
+    def delete(self,request,ck):
         email = request.user.email
         user = NewUserRegistration.objects.get(email__iexact=email)
         ct = cart.objects.get(student_mail__iexact =email)
