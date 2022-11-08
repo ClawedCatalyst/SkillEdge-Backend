@@ -7,7 +7,7 @@ from base.models import *
 class TopicSerializer(ModelSerializer):
     class Meta:
         model = Course
-        fields = ['id','category','topic','educator_mail','short_description','thumbnail','price']
+        fields = ['id','category','topic','educator_mail','short_description','thumbnail','price','rating','educator_name']
         
 class categorySerializer(ModelSerializer):
     class Meta:
@@ -46,3 +46,8 @@ class catSerializer(serializers.Serializer):
     Interest9 = serializers.BooleanField()
     Interest10 = serializers.BooleanField()
     Interest11 = serializers.BooleanField()
+    
+class lessonSerializer(ModelSerializer):
+    class Meta:
+        model = lessons
+        fields = ['topic','description','lesson']    
