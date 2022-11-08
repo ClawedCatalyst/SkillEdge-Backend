@@ -174,8 +174,17 @@ class searching(generics.ListCreateAPIView):
     queryset = Course.objects.all()
     serializer_class = TopicSerializer
 
-class addLessonView(APIView):
+class LessonView(APIView):
     permission_classes = [IsAuthenticated,]
+    
+    def get(self,request):
+        lesson = lessons.objects.all()
+        serializer = lessonSerializer(lesson, many=True)
+        
+        return Response(serializer.data)
+    
+    
+    
     def post(self,request):
         email = request.user.email
         user = NewUserRegistration.objects.get(email__iexact=email)
@@ -187,11 +196,17 @@ class addLessonView(APIView):
                 return Response(serializer.data)    
         else:
             return Response({'msg':'user is not an educator'}) 
- 
-class viewLesson(APIView):
-    def get(self,request):
-        lesson = lessons.objects.all()
-        serializer = lessonSerializer(lesson, many=True)
         
-        return Response(serializer.data)        
+    
+class viewSpecificCourseLesson(APIView):
+    def post(self,request):
+        try:
+            topic = request.data.get("topic")
+            lesson = lessons.objects.filter(topic=topic)
+            serializer = lessonSerializer(lesson, many=True)
+            return Response(serializer.data)
+        except:
+            return Response({"msg":"Enter a valid course"})  
+            
+             
         

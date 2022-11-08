@@ -5,7 +5,6 @@ from django.db.models.deletion import CASCADE
 from base.models import *
 from django.core.validators import MaxValueValidator , MinValueValidator , EmailValidator
 
-# from cloudinary_storage.validators import validate_video
 from cloudinary_storage.storage import VideoMediaCloudinaryStorage
 
 

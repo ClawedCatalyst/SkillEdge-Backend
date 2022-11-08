@@ -86,7 +86,7 @@ class profileDetails(APIView):
         def get(self, request):
             email = request.user.email
             user = NewUserRegistration.objects.get(email=email)
-            serializer = profileSerializer(user, many=True)
+            serializer = profileSerializer(user, many=False)
             return Response(serializer.data)
     
         def put(self, request):
@@ -95,7 +95,8 @@ class profileDetails(APIView):
             serializer = profileSerializer(instance=user, data = request.data)
             if serializer.is_valid():
                 serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
+                Vserializer = profileSerializer(user, many=False)
+                return Response(Vserializer.data, status=status.HTTP_200_OK)
             # return Response({'message':'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
     
 # @api_view(['POST','GET'])    

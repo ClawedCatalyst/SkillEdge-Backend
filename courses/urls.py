@@ -11,7 +11,7 @@ urlpatterns = [
     path('view_filtered_courses/', viewFilteredCourses.as_view(), name='viewFilteredCourses'),
     path('rate_course/', CourseRating.as_view(), name='rateCourse'),
     path('search_course/', searching.as_view(), name='searchCourse'),
-    path('add_lesson/', addLessonView.as_view(), name='addLessonView'),
-    path('view_lesson/', viewLesson.as_view(), name='viewLesson')
+    path('lesson/', LessonView.as_view(), name='LessonView'),
+    path('view_specific_lesson/', viewSpecificCourseLesson.as_view(), name='viewSpecificCourseLesson')
 ]
 
