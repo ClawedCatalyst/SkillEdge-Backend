@@ -2,7 +2,7 @@
 
 ### Backend Hosted link ----->
 
-https://skilledge.herokuapp.com/api/
+https://skilledge.herokuapp.com/
 
 ### Contributors ----->
 

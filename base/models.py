@@ -1,12 +1,11 @@
-from distutils.command.upload import upload
-from email.policy import default
-from locale import normalize
+import imp
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import (
     BaseUserManager, AbstractBaseUser
 )
 from django.core.validators import EmailValidator
+# from courses.models import *
 
 class MyUserManager(BaseUserManager):
     def create_user(self, email, name, user_name, password=None, confirm_password=None):
@@ -44,6 +43,13 @@ class MyUserManager(BaseUserManager):
         return user
 
 
+class interests(models.Model):
+    interest = models.CharField(max_length=50,null=True)
+    time_created = models.DateTimeField(auto_now_add=True)
+    time_updated = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(self.interest)    
 
 class NewUserRegistration(AbstractBaseUser):
     
@@ -62,11 +68,11 @@ class NewUserRegistration(AbstractBaseUser):
     gender = models.CharField(max_length=1, choices=GENDER, blank=True, null=True)
     mobile = models.BigIntegerField(blank=True, null=True)
     picture = models.ImageField(upload_to="images", default="images/defaultProfilePicture.png")
+    dateOfBirth = models.DateField(null=True,blank=True)
     wallet = models.PositiveIntegerField(null=True, blank=False, default=0)
-    
     otp = models.CharField(max_length=4, blank=True, null=True)
+    interested = models.ManyToManyField(interests)
 
-    is_prime = models.BooleanField(default=False)
     is_educator = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
@@ -102,4 +108,5 @@ class OTP(models.Model):
      
      def __str__(self):
          return self.time_created
-        
+     
+ 
