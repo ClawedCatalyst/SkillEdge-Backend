@@ -18,4 +18,3 @@ class AddCartSerializer(ModelSerializer):
         fields = ['cart','course']
 
         extra_kwargs = {'course': {'required': True},'cart': {'required': True} }
-        
