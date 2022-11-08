@@ -6,7 +6,7 @@ from base.models import *
 from django.core.validators import MaxValueValidator , MinValueValidator , EmailValidator
 
 # from cloudinary_storage.validators import validate_video
-from cloudinary.models import CloudinaryField
+from cloudinary_storage.storage import VideoMediaCloudinaryStorage
 
 
 
@@ -32,7 +32,7 @@ class lessons(models.Model):
     
     topic = models.ForeignKey(Course, on_delete=models.CASCADE)
     description = models.TextField(max_length=2000)
-    lesson = CloudinaryField(resource_type='video', null=True)
+    lesson = models.FileField(upload_to="courses/video",null=True,default='', storage=VideoMediaCloudinaryStorage())
     time = models.DateTimeField(auto_now_add=True)
     time_updated = models.DateTimeField(auto_now=True)
 

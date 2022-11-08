@@ -85,8 +85,8 @@ class profileDetails(APIView):
         permission_classes = [IsAuthenticated,]
         def get(self, request):
             email = request.user.email
-            user = NewUserRegistration.objects.get(email__iexact=email)
-            serializer = profileSerializer(user, many=False)
+            user = NewUserRegistration.objects.get(email=email)
+            serializer = profileSerializer(user, many=True)
             return Response(serializer.data)
     
         def put(self, request):
