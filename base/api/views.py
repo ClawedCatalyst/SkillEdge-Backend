@@ -97,7 +97,7 @@ class profileDetails(APIView):
                 serializer.save()
                 Vserializer = profileSerializer(user, many=False)
                 return Response(Vserializer.data, status=status.HTTP_200_OK)
-            # return Response({'message':'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message':'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
     
 # @api_view(['POST','GET'])    
 # def profileDetails(request):

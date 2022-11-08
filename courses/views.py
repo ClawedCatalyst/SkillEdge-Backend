@@ -15,6 +15,7 @@ from rest_framework import generics
 from django_filters.rest_framework import DjangoFilterBackend
 from .pagination import PaginationHandlerMixin
 from rest_framework.pagination import PageNumberPagination
+from .filters import CourseFilter
 
 
 class AddCategoryUser(APIView):
@@ -166,12 +167,24 @@ class CourseRating(APIView):
             #     return Response(rating)
             return Response({'msg':'enter valid details'})
 
-class searching(generics.ListCreateAPIView):
-
-    filter_backends = (filters.SearchFilter,DjangoFilterBackend)
-    filterset_fields = ['category','price','topic']
-    search_fields = ['topic','short_description']
-    queryset = Course.objects.all()
+class searching(APIView):
+    
+    def get(self,request):
+        queryset = Course.objects.all()
+        myFilter = CourseFilter(request.GET, queryset=queryset)
+        queryset = myFilter.qs
+        
+        searchResult = request.GET.get('search-area') or ''
+        
+        if searchResult:
+            queryset = queryset.filter(topic__icontains=searchResult)
+            
+        serializer = TopicSerializer(queryset, many=True)
+        
+        return Response(serializer.data)  
+    
+    
+    
     serializer_class = TopicSerializer
 
 class LessonView(APIView):
