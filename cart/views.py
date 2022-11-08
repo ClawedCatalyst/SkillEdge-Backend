@@ -15,7 +15,7 @@ class createcart(APIView):
         if ser.is_valid(raise_exception=True):
             ser.save()
             return Response({'msg':'cart added successfully'})
-            
+
 class cartid(APIView):
     permission_classes = [IsAuthenticated,]
     def get(self,request):
@@ -33,3 +33,14 @@ class cartadd(APIView):
         if ser.is_valid(raise_exception=True):
             ser.save()
             return Response({'msg':'course added successfully to cart'})
+
+class cartremove(APIView):
+    permission_classes = [IsAuthenticated,]
+    def post(self,request,ck):
+        email = request.user.email
+        user = NewUserRegistration.objects.get(email__iexact=email)
+        ct = cart.objects.get(student_mail__iexact =email)
+        # print(ct.id)
+        cart_courseid = cart_courses.objects.get(cart=ct.id,course=ck)
+        cart_courseid.delete()
+        return Response({'msg':'course removed successfully from cart'})

@@ -37,5 +37,5 @@ def addcourse(sender, **kwargs):
     cart_tp = cart_v.total_price
     cart_v.total_price = course.price + cart_tp
     cart_v.save()
-    # print(cart_item)
+    #print(cart_item)
     
