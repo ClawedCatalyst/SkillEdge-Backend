@@ -50,6 +50,7 @@ class ViewAllCategories(APIView):
 class ViewAllCourses(APIView):
     def get(self,request):
         data = Course.objects.all()
+        data = Course.objects.order_by('-rating')
         serializer = TopicSerializer(data, many=True)
         return Response(serializer.data)
 
@@ -117,6 +118,7 @@ class viewFilteredCourses(APIView, PaginationHandlerMixin):
         array = user.interested.all()
         courses = Course.objects.filter(category__in=array)
         
+        courses = Course.objects.order_by('-rating')
         page = self.paginate_queryset(courses)
         if page is not None:
             serializer = self.get_paginated_response(self.serializer_class(page,many=True).data)
