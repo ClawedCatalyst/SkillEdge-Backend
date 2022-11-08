@@ -58,6 +58,10 @@ class ViewAllCourses(APIView):
 class CourseView(APIView):
     permission_classes = [IsAuthenticated,]
     def post(self,request):
+        data = request.data
+        data._mutable = True
+        data["educator_mail"] = request.user.id
+        data._mutable = False
         email = request.user.email
         user = NewUserRegistration.objects.get(email__iexact=email)
         if user.is_educator == True:
