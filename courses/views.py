@@ -183,6 +183,9 @@ class searching(APIView):
             
         serializer = TopicSerializer(queryset, many=True)
         
+        if serializer.data == []:
+            return Response({'msg':'Nothing Found'}, status=status.HTTP_400_BAD_REQUEST)
+        
         return Response(serializer.data)  
     
     
@@ -219,9 +222,11 @@ class viewSpecificCourseLesson(APIView):
             topic = request.data.get("topic")
             lesson = lessons.objects.filter(topic=topic)
             serializer = lessonSerializer(lesson, many=True)
+            if serializer.data == []:
+                return Response({"msg":"No such course exists"},status=status.HTTP_400_BAD_REQUEST)
             return Response(serializer.data)
         except:
-            return Response({"msg":"Enter a valid course"})  
+            return Response({"msg":"Enter a valid course"}, status=status.HTTP_400_BAD_REQUEST)  
             
              
         
