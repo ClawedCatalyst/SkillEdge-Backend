@@ -27,18 +27,19 @@ class cartid(APIView):
 
 class cartadd(APIView):
     permission_classes = [IsAuthenticated,]
-    def put(self,request,ck):
+    def put(self,request):
         email = request.user.email
         user = NewUserRegistration.objects.get(email__iexact=email)
         array = user.purchasedCourse.all()
+        ck = request.data.get("course")
         for a in array:
             # crs = Course.objects.get(topic=a)
             # cid = crs.id
-            print(a.id)
-            print(ck)
-            if (a.id==ck) :
+            # print(a.id)
+            # print(ck)
+            if (a.id==int(ck)) :
                 return Response({'msg':'course already purchased'})
-                print('iterate')
+                # print('iterate')
         cart_details = cart.objects.get(email__iexact =email)
         cart_id = cart_details.id
         request.POST._mutable = True
