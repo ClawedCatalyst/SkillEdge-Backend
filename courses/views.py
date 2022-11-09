@@ -100,11 +100,11 @@ class CourseRating(APIView):
     def post(self,request):
         email = request.user.email
         user = NewUserRegistration.objects.get(email__iexact=email)
-        history = feedbackmodel.objects.filter(user = email,course=request.data.get('course'))
+        history = feedbackmodel.objects.filter(user = user.name,course=request.data.get('course'))
         if len(history)!=0:
             return Response({'msg':'you already gave your review for this course'})
         request.POST._mutable = True
-        request.data["user"] = email
+        request.data["user"] = user.name
         request.POST._mutable = False
         seri = GetRatingSerializer(data=request.data)
         if seri.is_valid(raise_exception=True):
