@@ -48,4 +48,5 @@ class feedbackmodel(models.Model):
     time = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.course.topic + " [" + self.comment[0:20] + "] "
+        return str(self.latest_review)
+        # return self.course.topic + " [" + self.comment[0:20] + "] "

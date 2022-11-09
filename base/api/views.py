@@ -96,7 +96,7 @@ class profileDetails(APIView):
             email = request.user.email
             user = NewUserRegistration.objects.get(email__iexact=email)
             serializer = profileSerializer(instance=user, data = request.data)
-            if serializer.is_valid():
+            if serializer.is_valid(raise_exception=True):
                 serializer.save()
                 Vserializer = profileSerializer(user, many=False)
                 return Response(Vserializer.data, status=status.HTTP_200_OK)
