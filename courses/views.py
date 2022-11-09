@@ -100,6 +100,7 @@ class CourseRating(APIView):
     def post(self,request):
         email = request.user.email
         user = NewUserRegistration.objects.get(email__iexact=email)
+        
         seri = GetRatingSerializer(data=request.data)
         if seri.is_valid(raise_exception=True):
             seri.save()
