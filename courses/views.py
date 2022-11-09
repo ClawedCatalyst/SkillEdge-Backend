@@ -204,5 +204,8 @@ class viewSpecificCourseLesson(APIView):
         except:
             return Response({"msg":"Enter a valid course"}, status=status.HTTP_400_BAD_REQUEST)  
             
-             
-        
+class CourseFeedback(APIView):
+    def get(self,request,ck):
+        course = feedbackmodel.objects.filter(course = ck)
+        ser = GetRatingSerializer(instance = course , many = True)
+        return Response(ser.data)
