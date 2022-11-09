@@ -100,6 +100,12 @@ class CourseRating(APIView):
     def post(self,request):
         email = request.user.email
         user = NewUserRegistration.objects.get(email__iexact=email)
+        history = feedbackmodel.objects.filter(user = email,course=request.data.get('course'))
+        if len(history)!=0:
+            return Response({'msg':'you already gave your review for this course'})
+        request.POST._mutable = True
+        request.data["user"] = email
+        request.POST._mutable = False
         seri = GetRatingSerializer(data=request.data)
         if seri.is_valid(raise_exception=True):
             seri.save()
@@ -155,7 +161,15 @@ class searching(APIView):
         
         return Response(serializer.data)  
     
-    
+class purchasedcourses(APIView):
+    permission_classes = [IsAuthenticated,]
+    def get(self,request):
+        email = request.user.email
+        user = NewUserRegistration.objects.get(email__iexact=email)
+        array = user.purchasedCourse.all()
+        courses = Course.objects.filter(id__in=array)
+        ser = TopicSerializer(courses, many=True)
+        return Response(ser.data)
     
 
 class LessonView(APIView):
@@ -196,5 +210,8 @@ class viewSpecificCourseLesson(APIView):
         except:
             return Response({"msg":"Enter a valid course"}, status=status.HTTP_400_BAD_REQUEST)  
             
-             
-        
+class CourseFeedback(APIView):
+    def get(self,request,ck):
+        course = feedbackmodel.objects.filter(course = ck)
+        ser = GetRatingSerializer(instance = course , many = True)
+        return Response(ser.data)

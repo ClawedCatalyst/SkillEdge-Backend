@@ -13,6 +13,8 @@ class BuyCourseView(APIView):
     def put(self,request):
         email = request.user.email
         student = NewUserRegistration.objects.get(email__iexact=email)
+        if student.is_verified == False:
+            return Response({'message':'You are not verified! Verify your mail'})
         cart_details = cart.objects.get(email__iexact =email)
         cart_id = cart_details.id
         totalprice=cart_details.total_price

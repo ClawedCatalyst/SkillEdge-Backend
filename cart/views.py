@@ -30,11 +30,20 @@ class cartadd(APIView):
     def put(self,request):
         email = request.user.email
         user = NewUserRegistration.objects.get(email__iexact=email)
+        array = user.purchasedCourse.all()
+        ck = request.data.get("course")
+        for a in array:
+            # crs = Course.objects.get(topic=a)
+            # cid = crs.id
+            # print(a.id)
+            # print(ck)
+            if (a.id==int(ck)) :
+                return Response({'msg':'course already purchased'})
+                # print('iterate')
         cart_details = cart.objects.get(email__iexact =email)
         cart_id = cart_details.id
         request.POST._mutable = True
         request.data["cart"] = cart_id
-        request.data["educator_name"] = user.name
         request.POST._mutable = False
         ser = AddCartSerializer(data=request.data)
         if ser.is_valid(raise_exception=True):
