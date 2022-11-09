@@ -9,7 +9,7 @@ class NewUserSerializer(ModelSerializer):
         model = NewUserRegistration
         fields = ["id","name","user_name", "email", "password", "confirm_password", "is_verified","is_educator","wallet"]
         extra_kwargs={
-            'password':{'write_only': True}
+            'password':{'write_only': True},
         }
     
     def validate(self, data):
