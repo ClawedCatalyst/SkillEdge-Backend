@@ -2,11 +2,10 @@ import imp
 from django.db import models
 # from django.contrib.auth.models import User
 from django.db.models.deletion import CASCADE
-from base.models import *
+from base.models import interests,NewUserRegistration
 from django.core.validators import MaxValueValidator , MinValueValidator , EmailValidator
 
 from cloudinary_storage.storage import VideoMediaCloudinaryStorage
-
 
 
 # Create your models here.
@@ -31,11 +30,13 @@ class Course(models.Model):
 class lessons(models.Model):
     
     topic = models.ForeignKey(Course, on_delete=models.CASCADE)
-    description = models.TextField(max_length=2000)
-    lesson = models.FileField(upload_to="courses/video",null=True,default='', storage=VideoMediaCloudinaryStorage())
+    lessonName = models.TextField(max_length=200,null=True)
+    file = models.FileField(upload_to="courses/video",null=True,default='', storage=VideoMediaCloudinaryStorage())
+    length=models.DecimalField(max_digits=100,decimal_places=2,default=0.0)
     time = models.DateTimeField(auto_now_add=True)
     time_updated = models.DateTimeField(auto_now=True)
-
+    
+    
     def __str__(self):
         return str(self.topic)
 

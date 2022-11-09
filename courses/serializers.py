@@ -50,4 +50,4 @@ class catSerializer(serializers.Serializer):
 class lessonSerializer(ModelSerializer):
     class Meta:
         model = lessons
-        fields = ['topic','description','lesson']    
+        fields = ['topic','lessonName','file','length']    

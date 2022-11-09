@@ -5,7 +5,9 @@ from django.contrib.auth.models import (
     BaseUserManager, AbstractBaseUser
 )
 from django.core.validators import EmailValidator
-# from courses.models import *
+from django.conf import settings
+
+# from courses.models import Course
 
 class MyUserManager(BaseUserManager):
     def create_user(self, email, name, user_name, password=None, confirm_password=None):
@@ -72,6 +74,7 @@ class NewUserRegistration(AbstractBaseUser):
     wallet = models.PositiveIntegerField(null=True, blank=False, default=0)
     otp = models.CharField(max_length=4, blank=True, null=True)
     interested = models.ManyToManyField(interests)
+    purchasedCourse = models.ManyToManyField(settings.INTEREST)
 
     is_educator = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
