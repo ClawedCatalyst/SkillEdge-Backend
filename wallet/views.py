@@ -39,6 +39,7 @@ class BuyCourseView(APIView):
             serializer = WalletSerializer(instance=educator, data = request.data)
             if serializer.is_valid():
                 serializer.save()
+                crs_id.delete()
         ser = WalletSerializer(instance=student, data = request.data)
         if ser.is_valid():
             ser.save()
