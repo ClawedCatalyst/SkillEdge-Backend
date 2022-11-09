@@ -78,7 +78,10 @@ class NewUserRegistrationView(APIView):
             user = NewUserRegistration.objects.get(email=email)
             token = getTokens(user)
             context = {'msg':'Registration Successfull', 'token':token}
-            return Response(context, status=status.HTTP_200_OK)
+            ser = CartSerializer(data=request.data)
+            if ser.is_valid(raise_exception=True):
+                ser.save()
+                return Response(context, status=status.HTTP_200_OK)
         return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
     
 class profileDetails(APIView):

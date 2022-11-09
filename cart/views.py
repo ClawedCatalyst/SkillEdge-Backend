@@ -21,7 +21,7 @@ class cartid(APIView):
     permission_classes = [IsAuthenticated,]
     def get(self,request):
         email = request.user.email
-        cart_details = cart.objects.get(student_mail__iexact =email)
+        cart_details = cart.objects.get(email__iexact =email)
         cart_id = cart_details.id
         return Response(cart_id)
 
@@ -30,12 +30,18 @@ class cartadd(APIView):
     def put(self,request):
         email = request.user.email
         user = NewUserRegistration.objects.get(email__iexact=email)
+        cart_details = cart.objects.get(email__iexact =email)
+        cart_id = cart_details.id
+        request.POST._mutable = True
+        request.data["cart"] = cart_id
+        request.data["educator_name"] = user.name
+        request.POST._mutable = False
         ser = AddCartSerializer(data=request.data)
         if ser.is_valid(raise_exception=True):
             # data =request.data
-            cart=request.data.get("cart")
+            carts=request.data.get("cart")
             course=request.data.get("course")
-            cart_course = cart_courses.objects.filter(cart=cart,course=course)
+            cart_course = cart_courses.objects.filter(cart=carts,course=course)
             l = len(cart_course)
             if l == 0:
                 ser.save()
@@ -48,7 +54,7 @@ class cartremove(APIView):
     def delete(self,request,ck):
         email = request.user.email
         user = NewUserRegistration.objects.get(email__iexact=email)
-        ct = cart.objects.get(student_mail__iexact =email)
+        ct = cart.objects.get(email__iexact =email)
         # print(ct.id)
         cart_courseid = cart_courses.objects.get(cart=ct.id,course=ck)
         cart_courseid.delete()
@@ -59,7 +65,7 @@ class viewcart(APIView):
     def get(self,request):
         email = request.user.email
         user = NewUserRegistration.objects.get(email__iexact=email)
-        ct = cart.objects.get(student_mail__iexact =email)
+        ct = cart.objects.get(email__iexact =email)
         # print(ct.id)
         courses = cart_courses.objects.filter(cart=ct.id)
         # print(courses)

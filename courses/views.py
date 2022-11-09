@@ -58,19 +58,16 @@ class ViewAllCourses(APIView):
 class CourseView(APIView):
     permission_classes = [IsAuthenticated,]
     def post(self,request):
-        data = request.data
-        data._mutable = True
-        data["educator_mail"] = request.user.id
-        data._mutable = False
         email = request.user.email
         user = NewUserRegistration.objects.get(email__iexact=email)
+        request.POST._mutable = True
+        request.data["educator_mail"] = request.user.id
+        request.data["educator_name"] = user.name
+        request.POST._mutable = False
         if user.is_educator == True:
             serializer = TopicSerializer(data=request.data)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
-                ck = Course.objects.latest('time_created')
-                ck.educator_name = user.name
-                ck.save()
                 return Response(serializer.data)    
         else:
             return Response({'msg':'user is not an educator'})    
