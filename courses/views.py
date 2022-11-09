@@ -160,6 +160,10 @@ class purchasedcourses(APIView):
     def get(self,request):
         email = request.user.email
         user = NewUserRegistration.objects.get(email__iexact=email)
+        array = user.purchasedCourse.all()
+        courses = Course.objects.filter(id__in=array)
+        ser = TopicSerializer(courses, many=True)
+        return Response(ser.data)
     
 
 class LessonView(APIView):
