@@ -74,7 +74,7 @@ class NewUserRegistration(AbstractBaseUser):
     wallet = models.PositiveIntegerField(null=True, blank=False, default=0)
     otp = models.CharField(max_length=4, blank=True, null=True)
     interested = models.ManyToManyField(interests)
-    purchasedCourse = models.ManyToManyField(settings.INTEREST)
+    purchasedCourse = models.ManyToManyField(settings.INTEREST, blank=True)
 
     is_educator = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
