@@ -43,9 +43,10 @@ class lessons(models.Model):
 class feedbackmodel(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE,null=True)
     latest_review = models.PositiveIntegerField(validators=[MaxValueValidator(5),MinValueValidator(1)],default=0)
-    # user = models.ForeignKey(NewUserRegistration, on_delete=models.CASCADE)
-    comment = models.CharField(max_length=100, null=True, blank=True)
+    #user = models.ForeignKey(NewUserRegistration, on_delete=models.CASCADE)
+    comment = models.CharField(max_length=100,default=" ")
     time = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.course.topic + " [" + self.comment[0:20] + "] "
+        return str(self.latest_review)
+        # return self.course.topic + " [" + self.comment[0:20] + "] "
