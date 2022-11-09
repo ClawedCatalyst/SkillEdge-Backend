@@ -155,7 +155,11 @@ class searching(APIView):
         
         return Response(serializer.data)  
     
-    
+class purchasedcourses(APIView):
+    permission_classes = [IsAuthenticated,]
+    def get(self,request):
+        email = request.user.email
+        user = NewUserRegistration.objects.get(email__iexact=email)
     
 
 class LessonView(APIView):

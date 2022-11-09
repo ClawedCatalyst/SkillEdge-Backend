@@ -34,7 +34,6 @@ class cartadd(APIView):
         cart_id = cart_details.id
         request.POST._mutable = True
         request.data["cart"] = cart_id
-        request.data["educator_name"] = user.name
         request.POST._mutable = False
         ser = AddCartSerializer(data=request.data)
         if ser.is_valid(raise_exception=True):
