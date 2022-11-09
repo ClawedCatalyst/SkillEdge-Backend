@@ -24,6 +24,21 @@ class BuyCourseView(APIView):
         student.wallet = stu_new_balance
         courses= cart_courses.objects.filter(cart=cart_id)
         # print(courses)
+        for crs_id in courses:
+            crs = Course.objects.get(id=crs_id.course.id)
+            # edu = GetEducatorSerializer(crs)
+            price = crs.price
+            income = 0.85 * price
+            edu_mail = crs.educator_mail
+            educator = NewUserRegistration.objects.get(email = edu_mail)
+            edu_balance = educator.wallet
+            new_balance = edu_balance + income
+            educator.wallet = new_balance
+            student.purchasedCourse.add(crs.id)
+            student.save()
+            serializer = WalletSerializer(instance=educator, data = request.data)
+            if serializer.is_valid():
+                serializer.save()
         ser = WalletSerializer(instance=student, data = request.data)
         if ser.is_valid():
             ser.save()
