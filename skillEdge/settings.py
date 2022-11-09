@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'courses.apps.CoursesConfig',
     'wallet.apps.WalletConfig',
     'cart.apps.CartConfig',
+    'payment.apps.PaymentConfig',
     
     'rest_framework',
     'django_filters',
