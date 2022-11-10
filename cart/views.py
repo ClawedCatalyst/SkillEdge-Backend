@@ -79,7 +79,7 @@ class viewcart(APIView):
         courses = cart_courses.objects.filter(cart=ct.id)
         # print(courses)
         if len(courses) == 0:
-            return Response({'msg':'no courses in cart'})
+            return Response({'msg':'no courses in cart'}, status=status.HTTP_400_BAD_REQUEST)
         else:
             courselist= []
             for ck in courses:
