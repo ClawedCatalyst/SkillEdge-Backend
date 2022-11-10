@@ -186,8 +186,20 @@ class LessonView(APIView):
     def post(self,request):
         email = request.user.email
         user = NewUserRegistration.objects.get(email__iexact=email)
+        topic = request.data.get("topic")
+        course = Course.objects.get(id=topic)
+        
+        if str(course.educator_mail) != str(email):
+            return Response({'msg':'invalid'})
+        
+        
         try:
+            print(course.educator_mail)
+            print(email)
             if user.is_educator == True:
+                    request.POST._mutable = True
+                    request.data["topic"] = topic
+                    request.POST._mutable = False
                     serializer = lessonSerializer(data=request.data)
                     if serializer.is_valid(raise_exception=True):
                         serializer.save()
