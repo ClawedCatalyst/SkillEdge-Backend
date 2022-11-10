@@ -104,6 +104,7 @@ class CourseRating(APIView):
         if len(history)!=0:
             return Response({'msg':'you already gave your review for this course'})
         request.POST._mutable = True
+        request.data["sender"] = user.id
         request.data["user"] = user.name
         request.POST._mutable = False
         seri = GetRatingSerializer(data=request.data)
