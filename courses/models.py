@@ -43,7 +43,7 @@ class lessons(models.Model):
 class feedbackmodel(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE,null=True)
     latest_review = models.PositiveIntegerField(validators=[MaxValueValidator(5),MinValueValidator(1)],default=0)
-    user = models.EmailField(max_length=255,validators=[EmailValidator()],null=True,blank=True)
+    user = models.CharField(max_length=200,null=True,blank=True)
     comment = models.CharField(max_length=100,default=" ")
     time = models.DateTimeField(auto_now_add=True)
 
