@@ -182,14 +182,15 @@ class LessonView(APIView):
         user = NewUserRegistration.objects.get(email__iexact=email)
         try:
             if user.is_educator == True:
-                serializer = lessonSerializer(data=request.data)
-                if serializer.is_valid(raise_exception=True):
-                    serializer.save()
-                    return Response(serializer.data)    
+                    serializer = lessonSerializer(data=request.data)
+                    if serializer.is_valid(raise_exception=True):
+                        serializer.save()
+                        print(serializer['topic'])
+                        return Response(serializer.data)    
             else:
-                return Response({'msg':'user is not an educator'})
+                    return Response({'msg':'user is not an educator'})
         except:
-            return Response({'msg':'invalid'})     
+            return Response({'msg':'invalid'}, status=status.HTTP_400_BAD_REQUEST)     
         
     
 class viewSpecificCourseLesson(APIView):
