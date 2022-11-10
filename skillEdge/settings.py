@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'courses.apps.CoursesConfig',
     'wallet.apps.WalletConfig',
     'cart.apps.CartConfig',
+    'payment.apps.PaymentConfig',
     
     'rest_framework',
     'django_filters',
@@ -53,6 +54,8 @@ INSTALLED_APPS = [
     'cloudinary_storage',
     'cloudinary',
 ]
+# AUTH_USER_MODEL='courses.Course'
+INTEREST = 'courses.Course'
 
 CLOUDINARY_STORAGE = {
         'CLOUD_NAME': os.environ.get('CLOUD_NAME'),

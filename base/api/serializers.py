@@ -9,7 +9,7 @@ class NewUserSerializer(ModelSerializer):
         model = NewUserRegistration
         fields = ["id","name","user_name", "email", "password", "confirm_password", "is_verified","is_educator","wallet"]
         extra_kwargs={
-            'password':{'write_only': True}
+            'password':{'write_only': True},
         }
     
     def validate(self, data):
@@ -34,9 +34,9 @@ class loginSerializer(ModelSerializer):
 class profileSerializer(ModelSerializer):
     class Meta:
         model = NewUserRegistration
-        fields = ("name","email", "user_name" ,"picture", "gender","dateOfBirth","mobile","is_educator")
+        fields = ("name", "user_name" ,"picture", "gender","dateOfBirth","mobile","is_educator","email",)
         
-        extra_kwargs = {'email': {'required': False ,"allow_null": True}}
+        extra_kwargs = {'email': {'required': False ,"allow_null": True},}
     
 
 class otpcheckserializer(serializers.Serializer):

@@ -2,12 +2,10 @@ import imp
 from django.db import models
 # from django.contrib.auth.models import User
 from django.db.models.deletion import CASCADE
-from base.models import *
+from base.models import interests,NewUserRegistration
 from django.core.validators import MaxValueValidator , MinValueValidator , EmailValidator
-
-# from cloudinary_storage.validators import validate_video
-from cloudinary.models import CloudinaryField
-
+from django.core.validators import EmailValidator
+from cloudinary_storage.storage import VideoMediaCloudinaryStorage
 
 
 # Create your models here.
@@ -32,20 +30,22 @@ class Course(models.Model):
 class lessons(models.Model):
     
     topic = models.ForeignKey(Course, on_delete=models.CASCADE)
-    description = models.TextField(max_length=2000)
-    lesson = CloudinaryField(resource_type='video', null=True)
+    lessonName = models.TextField(max_length=200,null=True)
+    file = models.FileField(upload_to="courses/video",null=True,default='', storage=VideoMediaCloudinaryStorage())
+    length=models.DecimalField(max_digits=100,decimal_places=2,default=0.0)
     time = models.DateTimeField(auto_now_add=True)
     time_updated = models.DateTimeField(auto_now=True)
-
+    
+    
     def __str__(self):
         return str(self.topic)
 
 class feedbackmodel(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE,null=True)
     latest_review = models.PositiveIntegerField(validators=[MaxValueValidator(5),MinValueValidator(1)],default=0)
-    # user = models.ForeignKey(NewUserRegistration, on_delete=models.CASCADE)
-    comment = models.CharField(max_length=100, null=True, blank=True)
+    user = models.EmailField(max_length=255,validators=[EmailValidator()],null=True,blank=True)
+    comment = models.CharField(max_length=100,default=" ")
     time = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.course.topic + " [" + self.comment[0:20] + "] "
+        return self.course.topic + " [" + str(self.latest_review) + "] "+ self.comment[0:20]

@@ -9,6 +9,7 @@ from django.utils import timezone
 from .serializers import *
 from .mail import *
 from base.models import *
+from cart.serializers import *
 from datetime import datetime, timedelta
 from django.contrib.auth.hashers import make_password, check_password
 
@@ -78,14 +79,17 @@ class NewUserRegistrationView(APIView):
             user = NewUserRegistration.objects.get(email=email)
             token = getTokens(user)
             context = {'msg':'Registration Successfull', 'token':token}
-            return Response(context, status=status.HTTP_200_OK)
+            ser = CartSerializer(data=request.data)
+            if ser.is_valid(raise_exception=True):
+                ser.save()
+                return Response(context, status=status.HTTP_200_OK)
         return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
     
 class profileDetails(APIView):
         permission_classes = [IsAuthenticated,]
         def get(self, request):
             email = request.user.email
-            user = NewUserRegistration.objects.get(email__iexact=email)
+            user = NewUserRegistration.objects.get(email=email)
             serializer = profileSerializer(user, many=False)
             return Response(serializer.data)
     
@@ -93,10 +97,17 @@ class profileDetails(APIView):
             email = request.user.email
             user = NewUserRegistration.objects.get(email__iexact=email)
             serializer = profileSerializer(instance=user, data = request.data)
-            if serializer.is_valid():
+            if serializer.is_valid(raise_exception=True):
                 serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            # return Response({'message':'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
+                Vserializer = profileSerializer(user, many=False)
+                return Response(Vserializer.data, status=status.HTTP_200_OK)
+            return Response({'message':'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        def delete(self, request):
+            email = request.user.email
+            user = NewUserRegistration.objects.get(email = email)
+            user.delete()
+            return Response({'message': 'Deleted'}, status=status.HTTP_200_OK)
     
 # @api_view(['POST','GET'])    
 # def profileDetails(request):
