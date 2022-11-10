@@ -75,10 +75,13 @@ class NewUserRegistrationView(APIView):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             email = serializer.data['email']
-            send_otp(email)
+            # send_otp(email)
             user = NewUserRegistration.objects.get(email=email)
+            # user_id = NewUserRegistration.objects.get(email=email).id
+            # print(user_id)
             token = getTokens(user)
             context = {'msg':'Registration Successfull', 'token':token}
+            request.data['user']= user.id
             ser = CartSerializer(data=request.data)
             if ser.is_valid(raise_exception=True):
                 ser.save()
