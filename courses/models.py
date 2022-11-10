@@ -4,7 +4,7 @@ from django.db import models
 from django.db.models.deletion import CASCADE
 from base.models import interests,NewUserRegistration
 from django.core.validators import MaxValueValidator , MinValueValidator , EmailValidator
-
+from django.core.validators import EmailValidator
 from cloudinary_storage.storage import VideoMediaCloudinaryStorage
 
 
@@ -43,10 +43,9 @@ class lessons(models.Model):
 class feedbackmodel(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE,null=True)
     latest_review = models.PositiveIntegerField(validators=[MaxValueValidator(5),MinValueValidator(1)],default=0)
-    #user = models.ForeignKey(NewUserRegistration, on_delete=models.CASCADE)
+    user = models.EmailField(max_length=255,validators=[EmailValidator()],null=True,blank=True)
     comment = models.CharField(max_length=100,default=" ")
     time = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return str(self.latest_review)
-        # return self.course.topic + " [" + self.comment[0:20] + "] "
+        return self.course.topic + " [" + str(self.latest_review) + "] "+ self.comment[0:20]
