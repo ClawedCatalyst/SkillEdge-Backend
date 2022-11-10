@@ -16,6 +16,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .pagination import PaginationHandlerMixin
 from rest_framework.pagination import PageNumberPagination
 from .filters import CourseFilter
+from moviepy.editor import VideoFileClip
+import math  
 
 
 class AddCategoryUser(APIView):
@@ -203,8 +205,16 @@ class LessonView(APIView):
                     serializer = lessonSerializer(data=request.data)
                     if serializer.is_valid(raise_exception=True):
                         serializer.save()
-                        print(serializer['topic'])
-                        return Response(serializer.data)    
+                        video = VideoFileClip(serializer.data['file'])
+                        length = video.duration
+                        seconds = math.floor(length%60)
+                        seconds = seconds/100
+                        minutes = math.floor(length//60)
+                        lesson_id = lessons.objects.get(id=serializer.data['id'])
+                        lesson_id.length = (minutes + seconds)
+                        lesson_id.save()
+                        
+                    return Response({'msg':'lesson added'})    
             else:
                     return Response({'msg':'user is not an educator'})
         except:
