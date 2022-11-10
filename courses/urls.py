@@ -16,4 +16,3 @@ urlpatterns = [
     path('purchased_courses/', purchasedcourses.as_view(), name='purchased_courses'),
     path('view_specific_lesson/', viewSpecificCourseLesson.as_view(), name='viewSpecificCourseLesson')
 ]
-
