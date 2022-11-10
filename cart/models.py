@@ -9,6 +9,7 @@ from django.db.models.signals import pre_save,post_save
 from django.dispatch import receiver
 
 class cart(models.Model):
+    user = models.OneToOneField(NewUserRegistration,on_delete=models.CASCADE,null=True )
     email = models.EmailField(verbose_name='email address',
         max_length=255,
         unique=True,

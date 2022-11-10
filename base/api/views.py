@@ -75,10 +75,13 @@ class NewUserRegistrationView(APIView):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             email = serializer.data['email']
-            send_otp(email)
+            # send_otp(email)
             user = NewUserRegistration.objects.get(email=email)
+            # user_id = NewUserRegistration.objects.get(email=email).id
+            # print(user_id)
             token = getTokens(user)
             context = {'msg':'Registration Successfull', 'token':token}
+            request.data['user']= user.id
             ser = CartSerializer(data=request.data)
             if ser.is_valid(raise_exception=True):
                 ser.save()
@@ -102,6 +105,12 @@ class profileDetails(APIView):
                 Vserializer = profileSerializer(user, many=False)
                 return Response(Vserializer.data, status=status.HTTP_200_OK)
             return Response({'message':'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        def delete(self, request):
+            email = request.user.email
+            user = NewUserRegistration.objects.get(email = email)
+            user.delete()
+            return Response({'message': 'Deleted'}, status=status.HTTP_200_OK)
     
 # @api_view(['POST','GET'])    
 # def profileDetails(request):

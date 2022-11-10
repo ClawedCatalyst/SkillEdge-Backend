@@ -100,11 +100,12 @@ class CourseRating(APIView):
     def post(self,request):
         email = request.user.email
         user = NewUserRegistration.objects.get(email__iexact=email)
-        history = feedbackmodel.objects.filter(user = email,course=request.data.get('course'))
+        history = feedbackmodel.objects.filter(user = user.name,course=request.data.get('course'))
         if len(history)!=0:
             return Response({'msg':'you already gave your review for this course'})
         request.POST._mutable = True
-        request.data["user"] = email
+        request.data["sender"] = user.id
+        request.data["user"] = user.name
         request.POST._mutable = False
         seri = GetRatingSerializer(data=request.data)
         if seri.is_valid(raise_exception=True):
@@ -186,16 +187,29 @@ class LessonView(APIView):
     def post(self,request):
         email = request.user.email
         user = NewUserRegistration.objects.get(email__iexact=email)
+        topic = request.data.get("topic")
+        course = Course.objects.get(id=topic)
+        
+        if str(course.educator_mail) != str(email):
+            return Response({'msg':'invalid'})
+        
+        
         try:
+            print(course.educator_mail)
+            print(email)
             if user.is_educator == True:
-                serializer = lessonSerializer(data=request.data)
-                if serializer.is_valid(raise_exception=True):
-                    serializer.save()
-                    return Response(serializer.data)    
+                    request.POST._mutable = True
+                    request.data["topic"] = topic
+                    request.POST._mutable = False
+                    serializer = lessonSerializer(data=request.data)
+                    if serializer.is_valid(raise_exception=True):
+                        serializer.save()
+                        print(serializer['topic'])
+                        return Response(serializer.data)    
             else:
-                return Response({'msg':'user is not an educator'})
+                    return Response({'msg':'user is not an educator'})
         except:
-            return Response({'msg':'invalid'})     
+            return Response({'msg':'invalid'}, status=status.HTTP_400_BAD_REQUEST)     
         
     
 class viewSpecificCourseLesson(APIView):
