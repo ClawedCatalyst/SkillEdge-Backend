@@ -23,6 +23,10 @@ class BuyCourseView(APIView):
         stu_balance = student.wallet
         edu_balance = educator.wallet
         new_balance = edu_balance + income
+        array = student.purchasedCourse.all()
+        for a in array:
+            if (a.id==int(ck)) :
+                return Response({'msg':'course already purchased'})
         if stu_balance < price :
             amount = price - stu_balance
             return Response({'message':'low balance. add' , 'amount to be added to buy this course' : amount })
@@ -37,6 +41,14 @@ class BuyCourseView(APIView):
         ser = WalletSerializer(instance=student, data = request.data)
         if ser.is_valid():
             ser.save()
+            cart_details = cart.objects.get(email__iexact =email)
+            cart_id = cart_details.id
+            totalprice = cart_details.total_price
+            c_status = cart_courses.objects.filter(cart = cart_id, course = ck)
+            if len(c_status) != 0:
+                c_status.delete()
+                cart_details.total_price = totalprice - price
+                cart_details.save()
             student.purchasedCourse.add(crs.id)
             student.save()
             return Response(ser.data)
