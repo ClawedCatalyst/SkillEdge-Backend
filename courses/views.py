@@ -1,8 +1,4 @@
-from re import search
-from unicodedata import category
 from rest_framework import status
-from logging import raiseExceptions
-from educator import serializers
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -10,9 +6,6 @@ from .serializers import *
 from .models import *
 from base.models import *
 from base.api.serializers import *
-from rest_framework import filters
-from rest_framework import generics
-from django_filters.rest_framework import DjangoFilterBackend
 from .pagination import PaginationHandlerMixin
 from rest_framework.pagination import PageNumberPagination
 from .filters import CourseFilter
@@ -77,7 +70,7 @@ class CourseView(APIView):
 class BasicPagination(PageNumberPagination):
     page_size_query_param = 'limit'            
 
-class viewFilteredCourses(APIView, PaginationHandlerMixin):
+class ViewFilteredCourses(APIView, PaginationHandlerMixin):
     permission_classes = [IsAuthenticated,]
     pagination_class = BasicPagination
     serializer_class = TopicSerializer
@@ -145,7 +138,7 @@ class CourseRating(APIView):
             #     return Response(rating)
             return Response({'msg':'enter valid details'})
 
-class searching(APIView):
+class Searching(APIView):
     
     def get(self,request):
         queryset = Course.objects.all()
@@ -164,7 +157,7 @@ class searching(APIView):
         
         return Response(serializer.data)  
     
-class purchasedcourses(APIView):
+class Purchasedcourses(APIView):
     permission_classes = [IsAuthenticated,]
     def get(self,request):
         email = request.user.email
@@ -222,7 +215,7 @@ class LessonView(APIView):
             return Response({'msg':'invalid'}, status=status.HTTP_400_BAD_REQUEST)     
         
     
-class viewSpecificCourseLesson(APIView):
+class ViewSpecificCourseLesson(APIView):
     def post(self,request):
         try:
             topic = request.data.get("topic")
