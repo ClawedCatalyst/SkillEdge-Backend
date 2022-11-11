@@ -75,7 +75,7 @@ class NewUserRegistrationView(APIView):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             email = serializer.data['email']
-            # send_otp(email)
+            send_otp(email)
             user = NewUserRegistration.objects.get(email=email)
             # user_id = NewUserRegistration.objects.get(email=email).id
             # print(user_id)
