@@ -99,4 +99,9 @@ class BuyAllCourseView(APIView):
             ser.save()
             return Response(ser.data)
         return Response({'message':'transaction failed'}, status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self,request):
+        email = request.user.email
+        student = NewUserRegistration.objects.get(email__iexact=email)
+        return Response(student.wallet)
         
