@@ -6,6 +6,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from base.models import *
 from base.api.serializers import *
 from educator.serializers import *
+from courses.models import *
+from courses.serializers import *
 
 
 class BecomeEducator(APIView):
@@ -24,4 +26,13 @@ class BecomeEducator(APIView):
                 return Response({'msg':'user is already a educator'}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({'msg':'user is not verified'}, status=status.HTTP_400_BAD_REQUEST)    
+
+    def get(self, request):
+        email = request.user.email
+        educator = NewUserRegistration.objects.get(email__iexact=email)
+        courses = Course.objects.filter(educator_mail = educator.id)
+        serializer = TopicSerializer(courses, many=True)
+        return Response(serializer.data)
+
+
         

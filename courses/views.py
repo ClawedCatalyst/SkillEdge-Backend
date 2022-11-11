@@ -16,9 +16,11 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .pagination import PaginationHandlerMixin
 from rest_framework.pagination import PageNumberPagination
 from .filters import CourseFilter
+from moviepy.editor import VideoFileClip
+import math  
 
 
-class AddCategoryUser(APIView):
+class CategoryView(APIView):
     permission_classes = [IsAuthenticated,]
     def put(self,request):
         email = request.user.email
@@ -37,24 +39,13 @@ class AddCategoryUser(APIView):
         serializer = profileSerializer(user, many=False)
 
         return Response(serializer.data)
-        
 
-
-class ViewAllCategories(APIView):
     def get(self,request):
         categories = interests.objects.all()
         serializer = categorySerializer(categories, many=True)
         
         return Response(serializer.data)
-
-class ViewAllCourses(APIView):
-    def get(self,request):
-        data = Course.objects.all()
-        data = Course.objects.order_by('-rating')
-        serializer = TopicSerializer(data, many=True)
-        return Response(serializer.data)
-
-
+        
 class CourseView(APIView):
     permission_classes = [IsAuthenticated,]
     def post(self,request):
@@ -70,7 +61,13 @@ class CourseView(APIView):
                 serializer.save()
                 return Response(serializer.data)    
         else:
-            return Response({'msg':'user is not an educator'})    
+            return Response({'msg':'user is not an educator'})   
+
+    def get(self,request):
+        data = Course.objects.all()
+        data = Course.objects.order_by('-rating')
+        serializer = TopicSerializer(data, many=True)
+        return Response(serializer.data) 
  
 class BasicPagination(PageNumberPagination):
     page_size_query_param = 'limit'            
@@ -204,8 +201,16 @@ class LessonView(APIView):
                     serializer = lessonSerializer(data=request.data)
                     if serializer.is_valid(raise_exception=True):
                         serializer.save()
-                        print(serializer['topic'])
-                        return Response(serializer.data)    
+                        video = VideoFileClip(serializer.data['file'])
+                        length = video.duration
+                        seconds = math.floor(length%60)
+                        seconds = seconds/100
+                        minutes = math.floor(length//60)
+                        lesson_id = lessons.objects.get(id=serializer.data['id'])
+                        lesson_id.length = (minutes + seconds)
+                        lesson_id.save()
+                        
+                    return Response({'msg':'lesson added'})    
             else:
                     return Response({'msg':'user is not an educator'})
         except:

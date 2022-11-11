@@ -25,20 +25,20 @@ class cartid(APIView):
         cart_id = cart_details.id
         return Response(cart_id)
 
-class cartadd(APIView):
+class Cart_View(APIView):
     permission_classes = [IsAuthenticated,]
     def put(self,request):
         email = request.user.email
         user = NewUserRegistration.objects.get(email__iexact=email)
-        array = user.purchasedCourse.all()
-        ck = request.data.get("course")
-        for a in array:
+        course_array = user.purchasedCourse.all()
+        course_id = request.data.get("course")
+        for course in course_array:
             # crs = Course.objects.get(topic=a)
             # cid = crs.id
             # print(a.id)
             # print(ck)
-            if (a.id==int(ck)) :
-                return Response({'msg':'course already purchased'})
+            if (course.id==int(course_id)) :
+                return Response({'msg':'course already purchased'}, status=status.HTTP_400_BAD_REQUEST)
                 # print('iterate')
         cart_details = cart.objects.get(email__iexact =email)
         cart_id = cart_details.id
@@ -56,7 +56,28 @@ class cartadd(APIView):
                 ser.save()
                 return Response({'msg':'course added successfully to cart'})
             else:
-                return Response({'msg':'course already added to cart'})
+                return Response({'msg':'course already added to cart'}, status=status.HTTP_400_BAD_REQUEST)
+
+    def get(self,request):
+        email = request.user.email
+        user = NewUserRegistration.objects.get(email__iexact=email)
+        cart_id = cart.objects.get(email__iexact =email)
+        # print(ct.id)
+        courses = cart_courses.objects.filter(cart=cart_id.id)
+        # print(courses)
+        if len(courses) == 0:
+            return Response({'msg':'no courses in cart'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            courselist= []
+            for course in courses:
+                cid = course.course.id
+                crs = Course.objects.get(id=cid)
+                ser = TopicSerializer(instance = crs)
+                # print(ser.data)
+                courselist.append(ser.data)
+
+        # ser = TopicSerializer(instance = courselist, many = True)
+        return Response(courselist)
 
 class cartremove(APIView):
     permission_classes = [IsAuthenticated,]
@@ -65,29 +86,8 @@ class cartremove(APIView):
         user = NewUserRegistration.objects.get(email__iexact=email)
         ct = cart.objects.get(email__iexact =email)
         # print(ct.id)
-        cart_courseid = cart_courses.objects.get(cart=ct.id,course=ck)
+        cart_courseid = cart_courses.objects.filter(cart=ct.id,course=ck)
+        if len(cart_courseid)==0:
+            return Response({'msg':'course does not exist in cart'}, status=status.HTTP_400_BAD_REQUEST)
         cart_courseid.delete()
         return Response({'msg':'course removed successfully from cart'})
-
-class viewcart(APIView):
-    permission_classes = [IsAuthenticated,]
-    def get(self,request):
-        email = request.user.email
-        user = NewUserRegistration.objects.get(email__iexact=email)
-        ct = cart.objects.get(email__iexact =email)
-        # print(ct.id)
-        courses = cart_courses.objects.filter(cart=ct.id)
-        # print(courses)
-        if len(courses) == 0:
-            return Response({'msg':'no courses in cart'}, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            courselist= []
-            for ck in courses:
-                cid = ck.course.id
-                crs = Course.objects.get(id=cid)
-                ser = TopicSerializer(instance = crs)
-                # print(ser.data)
-                courselist.append(ser.data)
-
-        # ser = TopicSerializer(instance = courselist, many = True)
-        return Response(courselist)
