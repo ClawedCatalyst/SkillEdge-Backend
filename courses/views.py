@@ -13,7 +13,7 @@ from moviepy.editor import VideoFileClip
 import math  
 
 
-class AddCategoryUser(APIView):
+class CategoryView(APIView):
     permission_classes = [IsAuthenticated,]
     def put(self,request):
         email = request.user.email
@@ -32,24 +32,13 @@ class AddCategoryUser(APIView):
         serializer = profileSerializer(user, many=False)
 
         return Response(serializer.data)
-        
 
-
-class ViewAllCategories(APIView):
     def get(self,request):
         categories = interests.objects.all()
         serializer = categorySerializer(categories, many=True)
         
         return Response(serializer.data)
-
-class ViewAllCourses(APIView):
-    def get(self,request):
-        data = Course.objects.all()
-        data = Course.objects.order_by('-rating')
-        serializer = TopicSerializer(data, many=True)
-        return Response(serializer.data)
-
-
+        
 class CourseView(APIView):
     permission_classes = [IsAuthenticated,]
     def post(self,request):
@@ -65,7 +54,13 @@ class CourseView(APIView):
                 serializer.save()
                 return Response(serializer.data)    
         else:
-            return Response({'msg':'user is not an educator'})    
+            return Response({'msg':'user is not an educator'})   
+
+    def get(self,request):
+        data = Course.objects.all()
+        data = Course.objects.order_by('-rating')
+        serializer = TopicSerializer(data, many=True)
+        return Response(serializer.data) 
  
 class BasicPagination(PageNumberPagination):
     page_size_query_param = 'limit'            
