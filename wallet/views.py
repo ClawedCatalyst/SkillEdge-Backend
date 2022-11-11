@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .serializers import *
@@ -14,6 +15,8 @@ class BuyCourseView(APIView):
     def put(self,request,ck):
         email = request.user.email
         student = NewUserRegistration.objects.get(email__iexact=email)
+        if student.is_verified == False:
+            return Response({'message':'You are not verified! Verify your mail'}, status=status.HTTP_400_BAD_REQUEST)
         crs = Course.objects.get(id = ck)
         edu = GetEducatorSerializer(crs)
         price = crs.price
@@ -23,13 +26,13 @@ class BuyCourseView(APIView):
         stu_balance = student.wallet
         edu_balance = educator.wallet
         new_balance = edu_balance + income
-        array = student.purchasedCourse.all()
-        for a in array:
-            if (a.id==int(ck)) :
-                return Response({'msg':'course already purchased'})
+        purchased_courses = student.purchasedCourse.all()
+        for p_course in purchased_courses:
+            if (p_course.id==int(ck)) :
+                return Response({'msg':'course already purchased'}, status=status.HTTP_400_BAD_REQUEST)
         if stu_balance < price :
             amount = price - stu_balance
-            return Response({'message':'low balance. add' , 'amount to be added to buy this course' : amount })
+            return Response({'message':'low balance. add' , 'amount to be added to buy this course' : amount }, status=status.HTTP_400_BAD_REQUEST)
         stu_new_balance = stu_balance - price
         educator.wallet = new_balance
         student.wallet = stu_new_balance
@@ -52,7 +55,7 @@ class BuyCourseView(APIView):
             student.purchasedCourse.add(crs.id)
             student.save()
             return Response(ser.data)
-        return Response({'message':'transaction failed'})
+        return Response({'message':'transaction failed'}, status=status.HTTP_400_BAD_REQUEST)
 
 class BuyAllCourseView(APIView):
     permission_classes = [IsAuthenticated,]
@@ -60,14 +63,14 @@ class BuyAllCourseView(APIView):
         email = request.user.email
         student = NewUserRegistration.objects.get(email__iexact=email)
         if student.is_verified == False:
-            return Response({'message':'You are not verified! Verify your mail'})
+            return Response({'message':'You are not verified! Verify your mail'}, status=status.HTTP_400_BAD_REQUEST)
         cart_details = cart.objects.get(email__iexact =email)
         cart_id = cart_details.id
         totalprice=cart_details.total_price
         stu_balance = student.wallet
         if stu_balance < totalprice :
             amount = totalprice - stu_balance
-            return Response({'message':'Low Balance!' , 'Amount to be added to buy this course' : amount })
+            return Response({'message':'Low Balance!' , 'Amount to be added to buy this course' : amount }, status=status.HTTP_400_BAD_REQUEST)
         stu_new_balance = stu_balance - totalprice
         student.wallet = stu_new_balance
         courses= cart_courses.objects.filter(cart=cart_id)
@@ -95,5 +98,5 @@ class BuyAllCourseView(APIView):
         if ser.is_valid():
             ser.save()
             return Response(ser.data)
-        return Response({'message':'transaction failed'})
+        return Response({'message':'transaction failed'}, status=status.HTTP_400_BAD_REQUEST)
         
