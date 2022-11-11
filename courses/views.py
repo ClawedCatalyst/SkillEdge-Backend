@@ -9,8 +9,12 @@ from base.api.serializers import *
 from .pagination import PaginationHandlerMixin
 from rest_framework.pagination import PageNumberPagination
 from .filters import CourseFilter
-from moviepy.editor import VideoFileClip
+# from moviepy.editor import VideoFileClip
 import math  
+# import cv2
+# import datetime
+import subprocess
+import json
 
 
 class CategoryView(APIView):
@@ -194,13 +198,27 @@ class LessonView(APIView):
                 serializer = lessonSerializer(data=request.data)
                 if serializer.is_valid(raise_exception=True):
                     serializer.save()
-                    video = VideoFileClip(str(serializer.data['file']))
-                    length = video.duration
-                    seconds = math.floor(length%60)
-                    seconds = seconds/100
-                    minutes = math.floor(length//60)
+                    # video = VideoFileClip(str(serializer.data['file']))
+                    # length = video.duration
+                    # seconds = math.floor(length%60)
+                    # seconds = seconds/100
+                    # minutes = math.floor(length//60)
+                    
+                    # length = cv2.VideoCapture(serializer.data['file'])
+                    
+                    # frames = length.get(cv2.CAP_PROP_FRAME_COUNT)
+                    # fps = length.get(cv2.CAP_PROP_FPS)
+                    
+                    # seconds = round(frames / fps)
+                    # video_time = datetime.timedelta(seconds=seconds)    
+                    
+                    input_filename = str(serializer.data['file'])
+                    out = subprocess.check_output(["ffprobe", "-v", "quiet", "-show_format", "-print_format", "json", input_filename])
+                    ffprobe_data = json.loads(out)
+                    duration_seconds = float(ffprobe_data["format"]["duration"])
+                    print(duration_seconds)
                     lesson_id = lessons.objects.get(id=serializer.data['id'])
-                    lesson_id.length = (minutes + seconds)
+                    lesson_id.length = str(duration_seconds)
                     lesson_id.save()
                     
                 return Response({'msg':'lesson added'})    
