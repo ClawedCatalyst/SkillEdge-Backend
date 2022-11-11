@@ -1,9 +1,9 @@
-from ast import Return
-import json
-from urllib import response
+# from ast import Return
+# import json
+# from urllib import response
 
-import environ
-import razorpay
+# import environ
+# import razorpay
 
 from .models import Order
 from base.models import *
@@ -161,6 +161,7 @@ class Flutter_Razorpay(APIView):
                 serializer.save()
                 print(user.wallet)
                 user.wallet += int(serializer.data['order_amount'])
+                user.save()
                 print(user.wallet)
                 return Response(serializer.data)
         except:
