@@ -234,4 +234,4 @@ cloudinary.config(
   api_secret = os.environ.get('API_SECRET'),
 )
 
-# os.environ["IMAGEIO_FFMPEG_EXE"] = "/usr/bin/ffmpeg"
+os.environ["IMAGEIO_FFMPEG_EXE"] = "/usr/bin/ffmpeg"

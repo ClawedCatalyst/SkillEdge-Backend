@@ -13,8 +13,8 @@ from .filters import CourseFilter
 import math  
 # import cv2
 # import datetime
-import subprocess
-import json
+# import subprocess
+# import json
 
 
 class CategoryView(APIView):
@@ -212,14 +212,11 @@ class LessonView(APIView):
                     # seconds = round(frames / fps)
                     # video_time = datetime.timedelta(seconds=seconds)    
                     
-                    input_filename = str(serializer.data['file'])
-                    out = subprocess.check_output(["ffprobe", "-v", "quiet", "-show_format", "-print_format", "json", input_filename])
-                    ffprobe_data = json.loads(out)
-                    duration_seconds = float(ffprobe_data["format"]["duration"])
-                    print(duration_seconds)
-                    lesson_id = lessons.objects.get(id=serializer.data['id'])
-                    lesson_id.length = str(duration_seconds)
-                    lesson_id.save()
+                    
+                    # print(duration_seconds)
+                    # lesson_id = lessons.objects.get(id=serializer.data['id'])
+                    # lesson_id.length = str(duration_seconds)
+                    # lesson_id.save()
                     
                 return Response({'msg':'lesson added'})    
         return Response({'msg':'user is not an educator'})
@@ -233,6 +230,9 @@ class ViewSpecificCourseLesson(APIView):
             topic = request.data.get("topic")
             lesson = lessons.objects.filter(topic=topic)
             serializer = lessonSerializer(lesson, many=True)
+            user_course=request.user.purchasedCourse.filter(id=topic)
+            if not user_course:
+                return Response({'msg':'Purchase Course First'})
             if serializer.data == []:
                 return Response({"msg":"No such course exists"},status=status.HTTP_400_BAD_REQUEST)
             return Response(serializer.data)
