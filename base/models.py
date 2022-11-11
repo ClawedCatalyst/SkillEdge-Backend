@@ -4,7 +4,7 @@ from django.utils import timezone
 from django.contrib.auth.models import (
     BaseUserManager, AbstractBaseUser
 )
-from django.core.validators import EmailValidator
+from django.core.validators import EmailValidator,MinValueValidator
 from django.conf import settings
 
 # from courses.models import Course
@@ -71,7 +71,7 @@ class NewUserRegistration(AbstractBaseUser):
     mobile = models.BigIntegerField(blank=True, default=91 )
     picture = models.ImageField(upload_to="images", default="images/defaultProfilePicture.png")
     dateOfBirth = models.DateField(blank=False,default="2022-10-10")
-    wallet = models.PositiveIntegerField(null=True, blank=False, default=0)
+    wallet = models.FloatField(validators=[MinValueValidator(0)],default=0,null=True,blank=False)
     otp = models.CharField(max_length=4, blank=True, null=True)
     interested = models.ManyToManyField(interests)
     purchasedCourse = models.ManyToManyField(settings.INTEREST)
