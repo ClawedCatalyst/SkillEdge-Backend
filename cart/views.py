@@ -38,7 +38,7 @@ class Cart_View(APIView):
             # print(a.id)
             # print(ck)
             if (course.id==int(course_id)) :
-                return Response({'msg':'course already purchased'})
+                return Response({'msg':'course already purchased'}, status=status.HTTP_400_BAD_REQUEST)
                 # print('iterate')
         cart_details = cart.objects.get(email__iexact =email)
         cart_id = cart_details.id
@@ -56,7 +56,7 @@ class Cart_View(APIView):
                 ser.save()
                 return Response({'msg':'course added successfully to cart'})
             else:
-                return Response({'msg':'course already added to cart'})
+                return Response({'msg':'course already added to cart'}, status=status.HTTP_400_BAD_REQUEST)
 
     def get(self,request):
         email = request.user.email
@@ -79,12 +79,15 @@ class Cart_View(APIView):
         # ser = TopicSerializer(instance = courselist, many = True)
         return Response(courselist)
 
-    def delete(self,request):
+class cartremove(APIView):
+    permission_classes = [IsAuthenticated,]
+    def delete(self,request,ck):
         email = request.user.email
         user = NewUserRegistration.objects.get(email__iexact=email)
-        cart_object = cart.objects.get(email__iexact =email)
-        course_id = request.data.get("course")
+        ct = cart.objects.get(email__iexact =email)
         # print(ct.id)
-        cart_courseid = cart_courses.objects.get(cart=cart_object.id,course=course_id)
+        cart_courseid = cart_courses.objects.filter(cart=ct.id,course=ck)
+        if len(cart_courseid)==0:
+            return Response({'msg':'course does not exist in cart'}, status=status.HTTP_400_BAD_REQUEST)
         cart_courseid.delete()
         return Response({'msg':'course removed successfully from cart'})
