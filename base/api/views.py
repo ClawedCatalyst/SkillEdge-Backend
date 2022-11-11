@@ -32,7 +32,7 @@ def getTokens(user):
     }
  
  
-class loginUser(APIView):
+class Login_user(APIView):
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')
@@ -51,7 +51,7 @@ class loginUser(APIView):
             return Response({'msg':'Enter correct Password'}, status=status.HTTP_400_BAD_REQUEST)
 
         
-class listOfRegisteredUser(APIView):
+class List_of_registered_user(APIView):
     def get(self, request):
         users = NewUserRegistration.objects.all()
         serializer = NewUserSerializer(users, many = True)
@@ -69,13 +69,13 @@ class listOfRegisteredUser(APIView):
 
 
 
-class NewUserRegistrationView(APIView): 
+class New_user_registration(APIView): 
     def post(self, request,):
         serializer = NewUserSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             email = serializer.data['email']
-            # send_otp(email)
+            send_otp(email)
             user = NewUserRegistration.objects.get(email=email)
             # user_id = NewUserRegistration.objects.get(email=email).id
             # print(user_id)
@@ -88,7 +88,7 @@ class NewUserRegistrationView(APIView):
                 return Response(context, status=status.HTTP_200_OK)
         return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
     
-class profileDetails(APIView):
+class Profile_details(APIView):
         permission_classes = [IsAuthenticated,]
         def get(self, request):
             email = request.user.email
@@ -129,7 +129,7 @@ class profileDetails(APIView):
     
     
 
-class otp_check(APIView):
+class OTP_check(APIView):
     def post(self, request):
         ser = otpcheckserializer(data=request.data)
         if ser.is_valid(raise_exception=True):
@@ -175,7 +175,7 @@ class otp_check(APIView):
             context = {'msg':'verification Successfull'}
             return Response(context, status=status.HTTP_200_OK)
 
-class resend_otp(APIView):
+class Resend_otp(APIView):
     def post(self, request, format=None):
         ser = resetpassserializer(data=request.data)
         if ser.is_valid(raise_exception=True):
@@ -197,7 +197,7 @@ class resend_otp(APIView):
 
 
 
-class resetpassView(APIView):
+class Reset_password(APIView):
     def post(self, request):
         ser = resetpassserializer(data=request.data)
         if ser.is_valid(raise_exception=True):
@@ -211,7 +211,7 @@ class resetpassView(APIView):
             context = {'msg':'check mail for otp'}
             return Response(context, status=status.HTTP_200_OK)
 
-class newpassView(APIView):
+class New_password(APIView):
     def post(self, request):
         ser = passchangeserializer(data=request.data)
         if ser.is_valid(raise_exception=True):
@@ -251,7 +251,7 @@ class newpassView(APIView):
                 context = {'msg':'password and confirm password must be same'}
                 return Response(context, status=status.HTPP_400_BAD_REQUEST)    
             
-class Verifycheck(APIView):
+class Verify_check(APIView):
         permission_classes = [IsAuthenticated,]
         def get(self, request):
             email = request.user.email
