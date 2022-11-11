@@ -3,7 +3,6 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate
-from django.contrib.auth.decorators import login_required
 from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
 from .serializers import *
@@ -11,18 +10,8 @@ from .mail import *
 from base.models import *
 from cart.serializers import *
 from datetime import datetime, timedelta
-from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth.hashers import make_password
 
-# class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-#     @classmethod
-#     def get_token(cls, user):
-#         token = super().get_token(user)
-
-#         token['user_name'] = user.user_name
-#         return (token)
-
-# class MyTokenObtainPairView(TokenObtainPairView):
-#     serializer_class = MyTokenObtainPairSerializer
 
 def getTokens(user):
     refresh = RefreshToken.for_user(user)
@@ -58,17 +47,6 @@ class List_of_registered_user(APIView):
         SerializerData = [serializer.data]
 
         return Response(SerializerData)
-    
-# class listOfRegisteredUser(APIView):
-#      def get(self, request, format = None):
-#         users = NewUserRegistration.objects.all()
-#         serializer = NewUserSerializer(users, many = True)
-#         Serializer_list = [serializer.data]
-
-#         return Response(Serializer_list)
-
-
-
 class New_user_registration(APIView): 
     def post(self, request,):
         serializer = NewUserSerializer(data=request.data)
@@ -112,23 +90,7 @@ class Profile_details(APIView):
             user.delete()
             return Response({'message': 'Deleted'}, status=status.HTTP_200_OK)
     
-# @api_view(['POST','GET'])    
-# def profileDetails(request):
-#     email = request.data.get("email")
-#     password = request.data.get("password")
-#     chkUser = authenticate(email=email, password=password)
     
-#     if chkUser is not None:
-#         user = NewUserRegistration.objects.get(email = email)
-#         serializer = profileSerializer(user, many=False)
-#         return Response(serializer.data)
-#     else:
-#         return Response({'msg':'user does not exits'})
-    
-    
-    
-    
-
 class OTP_check(APIView):
     def post(self, request):
         ser = otpcheckserializer(data=request.data)
