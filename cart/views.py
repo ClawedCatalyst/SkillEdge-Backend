@@ -10,14 +10,14 @@ from .models import *
 from base.models import *
 
 # Create your views here.
-class createcart(APIView):
+class Create_cart(APIView):
     def post(self,request):
         ser = CartSerializer(data=request.data)
         if ser.is_valid(raise_exception=True):
             ser.save()
             return Response({'msg':'cart added successfully'})
 
-class cartid(APIView):
+class Cart_id(APIView):
     permission_classes = [IsAuthenticated,]
     def get(self,request):
         email = request.user.email
@@ -25,7 +25,7 @@ class cartid(APIView):
         cart_id = cart_details.id
         return Response(cart_id)
 
-class Cart_View(APIView):
+class Cart(APIView):
     permission_classes = [IsAuthenticated,]
     def put(self,request):
         email = request.user.email
@@ -79,7 +79,7 @@ class Cart_View(APIView):
         # ser = TopicSerializer(instance = courselist, many = True)
         return Response(courselist)
 
-class cartremove(APIView):
+class Cart_remove(APIView):
     permission_classes = [IsAuthenticated,]
     def delete(self,request,ck):
         email = request.user.email
