@@ -36,8 +36,6 @@ class BuyCourseView(APIView):
         student_new_balance = student_balance - price
         educator.wallet = new_balance
         student.wallet = student_new_balance
-        # student = NewUserRegistration.objects.get(id=sk)
-        # return Response(new_balance)
         serializer_eduactor = WalletSerializer(instance=educator, data = request.data)
         if serializer_eduactor.is_valid():
             serializer_eduactor.save()

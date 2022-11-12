@@ -31,22 +31,20 @@ class Login_user(APIView):
             context = {'msg':'user with this mail does not exist'}
             return Response(context, status=status.HTTP_400_BAD_REQUEST)
 
-        user = NewUserRegistration.objects.get(email = email)
         user = authenticate(email=email, password=password)
         if user is not None:
             token = getTokens(user)
             return Response({'id':user.id,'token': token,'msg':'Login Success'}, status=status.HTTP_200_OK)
-        else:
-            return Response({'msg':'Enter correct Password'}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'msg':'Enter correct Password'}, status=status.HTTP_400_BAD_REQUEST)
 
         
 class List_of_registered_user(APIView):
     def get(self, request):
         users = NewUserRegistration.objects.all()
         serializer = NewUserSerializer(users, many = True)
-        SerializerData = [serializer.data]
-
-        return Response(SerializerData)
+        return Response(serializer.data)
+        
 class New_user_registration(APIView): 
     def post(self, request,):
         serializer = NewUserSerializer(data=request.data)
@@ -80,8 +78,8 @@ class Profile_details(APIView):
             serializer = profileSerializer(instance=user, data = request.data)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
-                Vserializer = profileSerializer(user, many=False)
-                return Response(Vserializer.data, status=status.HTTP_200_OK)
+                Profile_serializer = profileSerializer(user, many=False)
+                return Response(Profile_serializer.data, status=status.HTTP_200_OK)
             return Response({'message':'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
         
         def delete(self, request):
@@ -97,7 +95,6 @@ class OTP_check(APIView):
         if ser.is_valid(raise_exception=True):
             email = ser.data['email']
             otp = ser.data['otp']
-            
             email = ser.data['email']
             query  = OTP.objects.filter(verifyEmail = email)
             if not query.exists():
@@ -221,6 +218,6 @@ class Verify_check(APIView):
             if user.is_verified == True:
                 context = {'msg':'User is verified'}
                 return Response(context, status=status.HTTP_200_OK)
-            else:
-                context = {'msg':'User is not verified'}
-                return Response(context, status=status.HTTP_400_BAD_REQUEST)
+                
+            context = {'msg':'User is not verified'}
+            return Response(context, status=status.HTTP_400_BAD_REQUEST)
