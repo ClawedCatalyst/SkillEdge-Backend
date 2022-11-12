@@ -176,8 +176,7 @@ class New_password(APIView):
         if serializer.is_valid(raise_exception=True):
             email = serializer.data['email']
             otp = serializer.data['otp']
-            password = serializer.data['passwordd']
-            confirm_password =serializer.data['confirm_passwordd']
+            password = serializer.data['password']
 
             user = NewUserRegistration.objects.filter(email__iexact = email)
             if not user.exists():
@@ -198,17 +197,13 @@ class New_password(APIView):
                 context = {'msg':'Password entered is same as old one'}
                 return Response(context, status.HTTP_400_BAD_REQUEST)
 
-            if password == confirm_password:
-                user = user.first()
-                user.password = make_password(password)
-                user.is_verified = True
-                user.otp = random.randint(101 , 999)
-                user.save()
-                context = {'msg':'reset Successfull'}
-                return Response(context, status=status.HTTP_200_OK)
-            else:
-                context = {'msg':'password and confirm password must be same'}
-                return Response(context, status=status.HTPP_400_BAD_REQUEST)    
+            user = user.first()
+            user.password = make_password(password)
+            user.is_verified = True
+            user.otp = random.randint(101 , 999)
+            user.save()
+            context = {'msg':'reset Successfull'}
+            return Response(context, status=status.HTTP_200_OK)    
             
 class Verify_check(APIView):
         permission_classes = [IsAuthenticated,]
