@@ -7,6 +7,7 @@ from courses.models import *
 from base.models import *
 from cart.models import *
 from rest_framework.permissions import IsAuthenticated
+from .mail import send_course_confirmation
 
 # Create your views here.
 
@@ -52,6 +53,7 @@ class BuyCourseView(APIView):
                 cart_details.save()
             student.purchasedCourse.add(course.id)
             student.save()
+            send_course_confirmation(request.user.email)
             return Response(serializer_student.data)
         return Response({'msg':'transaction failed'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -97,6 +99,7 @@ class BuyAllCourseView(APIView):
         serializer_student = WalletSerializer(instance=student, data = request.data)
         if serializer_student.is_valid():
             serializer_student.save()
+            send_course_confirmation(request.user.email)
             return Response(serializer_student.data)
         return Response({'msg':'transaction failed'}, status=status.HTTP_400_BAD_REQUEST)
 

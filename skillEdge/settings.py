@@ -227,9 +227,3 @@ CSRF_TRUSTED_ORIGINS = [
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 # DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.VideoMediaCloudinaryStorage'
-
-cloudinary.config( 
-  cloud_name =os.environ.get('CLOUD_NAME'), 
-  api_key = os.environ.get('API_KEY'), 
-  api_secret = os.environ.get('API_SECRET'),
-)

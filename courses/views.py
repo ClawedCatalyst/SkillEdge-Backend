@@ -11,6 +11,7 @@ from rest_framework.pagination import PageNumberPagination
 from .filters import CourseFilter
 from moviepy.editor import VideoFileClip
 import math  
+# from pymediainfo import MediaInfo
 # import cv2
 # import datetime
 # import subprocess
@@ -187,34 +188,37 @@ class Lesson_view(APIView):
         if str(course.educator_mail) != str(email):
             return Response({'msg':'invalid'})
         
-        
-        # try:
-        print(course.educator_mail)
-        print(email)
-        if user.is_educator == True:
-                request.POST._mutable = True
-                request.data["topic"] = topic
-                request.POST._mutable = False
-                serializer = lessonSerializer(data=request.data)
-                if serializer.is_valid(raise_exception=True):
-                    serializer.save()
-                    print((serializer.data['file']))
-                    video = VideoFileClip(str(serializer.data['file']))
-                    length = video.duration
-                    seconds = math.floor(length%60)
-                    seconds = seconds/100
-                    minutes = math.floor(length//60)   
-                    
-                    
-                    print(minutes+seconds)
+        try:
+            print(course.educator_mail)
+            print(email)
+            if user.is_educator == True:
+                    request.POST._mutable = True
+                    request.data["topic"] = topic
+                    request.POST._mutable = False
+                    serializer = lessonSerializer(data=request.data)
+                    if serializer.is_valid(raise_exception=True):
+                        serializer.save()
+                        # media_info = MediaInfo.parse(serializer.data['file'])
+                        # length = media_info.tracks[0].duration
+                        
+                        # video = VideoFileClip(str(serializer.data['file']))
+                        # print(serializer.data['file'])
+                        # length = video.duration
+                        # print(length)
+                        # seconds = math.floor(length%60)
+                        # seconds = seconds/100
+                        # minutes = math.floor(length//60)   
+                        
+                        
+                        # print(minutes+seconds)
                     # lesson_id = lessons.objects.get(id=serializer.data['id'])
                     # lesson_id.length = str(duration_seconds)
                     # lesson_id.save()
                     
-                return Response({'msg':'lesson added'})    
-        return Response({'msg':'user is not an educator'})
-        # except:
-            # return Response({'msg':'invalid'}, status=status.HTTP_400_BAD_REQUEST)     
+                    return Response({'msg':'lesson added'})    
+            return Response({'msg':'user is not an educator'})
+        except:
+            return Response({'msg':'invalid'}, status=status.HTTP_400_BAD_REQUEST)     
         
     
 class View_specific_course_lesson(APIView):
