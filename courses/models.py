@@ -38,7 +38,7 @@ class lessons(models.Model):
     
     
     def __str__(self):
-        return str(self.topic)
+        return str(self.topic) + " - " + str(self.lessonName[0:25])
 
 class feedbackmodel(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE,null=True)

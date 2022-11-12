@@ -11,10 +11,12 @@ from base.models import *
 
 # Create your views here.
 class Create_cart(APIView):
+    permission_classes = [IsAuthenticated,]
     def post(self,request):
-        ser = CartSerializer(data=request.data)
-        if ser.is_valid(raise_exception=True):
-            ser.save()
+        email = request.user.email
+        serializer = CartSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
             return Response({'msg':'cart added successfully'})
 
 class Cart_id(APIView):
@@ -45,15 +47,15 @@ class Cart(APIView):
         request.POST._mutable = True
         request.data["cart"] = cart_id
         request.POST._mutable = False
-        ser = AddCartSerializer(data=request.data)
-        if ser.is_valid(raise_exception=True):
+        serializer = AddCartSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
             # data =request.data
             carts=request.data.get("cart")
             course=request.data.get("course")
             cart_course = cart_courses.objects.filter(cart=carts,course=course)
             l = len(cart_course)
             if l == 0:
-                ser.save()
+                serializer.save()
                 return Response({'msg':'course added successfully to cart'})
             else:
                 return Response({'msg':'course already added to cart'}, status=status.HTTP_400_BAD_REQUEST)
@@ -72,11 +74,11 @@ class Cart(APIView):
             for course in courses:
                 cid = course.course.id
                 crs = Course.objects.get(id=cid)
-                ser = TopicSerializer(instance = crs)
-                # print(ser.data)
-                courselist.append(ser.data)
+                serializer = TopicSerializer(instance = crs)
+                # print(serializer.data)
+                courselist.append(serializer.data)
 
-        # ser = TopicSerializer(instance = courselist, many = True)
+        # serializer = TopicSerializer(instance = courselist, many = True)
         return Response(courselist)
 
     def delete(self,request,ck):

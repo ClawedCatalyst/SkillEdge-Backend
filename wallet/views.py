@@ -24,19 +24,15 @@ class BuyCourseView(APIView):
         income = 0.85 * price
         educator_details_mail = course.educator_mail
         educator = NewUserRegistration.objects.get(email = educator_details_mail)
-        student_balance = student.wallet
-        educator_details_balance = educator.wallet
-        new_balance = educator_details_balance + income
         purchased_courses = student.purchasedCourse.all()
         for purchased_course in purchased_courses:
             if (purchased_course.id==int(ck)) :
                 return Response({'msg':'course already purchased'}, status=status.HTTP_400_BAD_REQUEST)
-        if student_balance < price :
-            amount = price - student_balance
-            return Response({'msg':'low balance. add' , 'amount to be added to buy this course' : amount }, status=status.HTTP_400_BAD_REQUEST)
-        student_new_balance = student_balance - price
-        educator.wallet = new_balance
-        student.wallet = student_new_balance
+        if student.wallet < price :
+            amount = price - student.wallet
+            return Response({'msg':'Low Balance!' , 'Amount to be added:' : amount }, status=status.HTTP_400_BAD_REQUEST)
+        educator.wallet += income
+        student.wallet -= price
         serializer_eduactor = WalletSerializer(instance=educator, data = request.data)
         if serializer_eduactor.is_valid():
             serializer_eduactor.save()
@@ -67,12 +63,10 @@ class BuyAllCourseView(APIView):
         cart_details = cart.objects.get(email__iexact =email)
         cart_id = cart_details.id
         totalprice=cart_details.total_price
-        student_balance = student.wallet
-        if student_balance < totalprice :
-            amount = totalprice - student_balance
-            return Response({'msg':'Low Balance!' , 'Amount to be added to buy this course' : amount }, status=status.HTTP_400_BAD_REQUEST)
-        student_new_balance = student_balance - totalprice
-        student.wallet = student_new_balance
+        if student.wallet < totalprice :
+            amount = totalprice - student.wallet
+            return Response({'msg':'Low Balance!' , 'Amount to be added' : amount }, status=status.HTTP_400_BAD_REQUEST)
+        student.wallet -= totalprice
         courses= cart_courses.objects.filter(cart=cart_id)
         if len(courses)==0:
             return Response({'msg':'no courses in cart'}, status=status.HTTP_400_BAD_REQUEST)
