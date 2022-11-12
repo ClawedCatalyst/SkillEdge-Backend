@@ -9,8 +9,9 @@ from base.api.serializers import *
 from .pagination import PaginationHandlerMixin
 from rest_framework.pagination import PageNumberPagination
 from .filters import CourseFilter
-# from moviepy.editor import VideoFileClip
+from moviepy.editor import VideoFileClip
 import math  
+from pymediainfo import MediaInfo
 # import cv2
 # import datetime
 # import subprocess
@@ -198,26 +199,23 @@ class Lesson_view(APIView):
                     serializer = lessonSerializer(data=request.data)
                     if serializer.is_valid(raise_exception=True):
                         serializer.save()
+                        # media_info = MediaInfo.parse(serializer.data['file'])
+                        # length = media_info.tracks[0].duration
+                        
                         # video = VideoFileClip(str(serializer.data['file']))
+                        # print(serializer.data['file'])
                         # length = video.duration
+                        # print(length)
                         # seconds = math.floor(length%60)
                         # seconds = seconds/100
-                        # minutes = math.floor(length//60)
-                        
-                        # length = cv2.VideoCapture(serializer.data['file'])
-                        
-                        # frames = length.get(cv2.CAP_PROP_FRAME_COUNT)
-                        # fps = length.get(cv2.CAP_PROP_FPS)
-                        
-                        # seconds = round(frames / fps)
-                        # video_time = datetime.timedelta(seconds=seconds)    
+                        # minutes = math.floor(length//60)   
                         
                         
-                        # print(duration_seconds)
-                        # lesson_id = lessons.objects.get(id=serializer.data['id'])
-                        # lesson_id.length = str(duration_seconds)
-                        # lesson_id.save()
-                        
+                        # print(minutes+seconds)
+                    # lesson_id = lessons.objects.get(id=serializer.data['id'])
+                    # lesson_id.length = str(duration_seconds)
+                    # lesson_id.save()
+                    
                     return Response({'msg':'lesson added'})    
             return Response({'msg':'user is not an educator'})
         except:
