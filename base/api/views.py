@@ -3,7 +3,6 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate
-from django.contrib.auth.decorators import login_required
 from rest_framework.permissions import IsAuthenticated
 from django.utils import timezone
 from .serializers import *
@@ -11,18 +10,8 @@ from .mail import *
 from base.models import *
 from cart.serializers import *
 from datetime import datetime, timedelta
-from django.contrib.auth.hashers import make_password, check_password
+from django.contrib.auth.hashers import make_password
 
-# class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-#     @classmethod
-#     def get_token(cls, user):
-#         token = super().get_token(user)
-
-#         token['user_name'] = user.user_name
-#         return (token)
-
-# class MyTokenObtainPairView(TokenObtainPairView):
-#     serializer_class = MyTokenObtainPairSerializer
 
 def getTokens(user):
     refresh = RefreshToken.for_user(user)
@@ -42,33 +31,20 @@ class Login_user(APIView):
             context = {'msg':'user with this mail does not exist'}
             return Response(context, status=status.HTTP_400_BAD_REQUEST)
 
-        user = NewUserRegistration.objects.get(email = email)
         user = authenticate(email=email, password=password)
         if user is not None:
             token = getTokens(user)
             return Response({'id':user.id,'token': token,'msg':'Login Success'}, status=status.HTTP_200_OK)
-        else:
-            return Response({'msg':'Enter correct Password'}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({'msg':'Enter correct Password'}, status=status.HTTP_400_BAD_REQUEST)
 
         
 class List_of_registered_user(APIView):
     def get(self, request):
         users = NewUserRegistration.objects.all()
         serializer = NewUserSerializer(users, many = True)
-        SerializerData = [serializer.data]
-
-        return Response(SerializerData)
-    
-# class listOfRegisteredUser(APIView):
-#      def get(self, request, format = None):
-#         users = NewUserRegistration.objects.all()
-#         serializer = NewUserSerializer(users, many = True)
-#         Serializer_list = [serializer.data]
-
-#         return Response(Serializer_list)
-
-
-
+        return Response(serializer.data)
+        
 class New_user_registration(APIView): 
     def post(self, request,):
         serializer = NewUserSerializer(data=request.data)
@@ -82,9 +58,9 @@ class New_user_registration(APIView):
             token = getTokens(user)
             context = {'msg':'Registration Successfull', 'token':token}
             request.data['user']= user.id
-            ser = CartSerializer(data=request.data)
-            if ser.is_valid(raise_exception=True):
-                ser.save()
+            serializer = CartSerializer(data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
                 return Response(context, status=status.HTTP_200_OK)
         return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
     
@@ -102,8 +78,8 @@ class Profile_details(APIView):
             serializer = profileSerializer(instance=user, data = request.data)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
-                Vserializer = profileSerializer(user, many=False)
-                return Response(Vserializer.data, status=status.HTTP_200_OK)
+                Profile_serializer = profileSerializer(user, many=False)
+                return Response(Profile_serializer.data, status=status.HTTP_200_OK)
             return Response({'message':'Invalid'}, status=status.HTTP_400_BAD_REQUEST)
         
         def delete(self, request):
@@ -112,31 +88,14 @@ class Profile_details(APIView):
             user.delete()
             return Response({'message': 'Deleted'}, status=status.HTTP_200_OK)
     
-# @api_view(['POST','GET'])    
-# def profileDetails(request):
-#     email = request.data.get("email")
-#     password = request.data.get("password")
-#     chkUser = authenticate(email=email, password=password)
     
-#     if chkUser is not None:
-#         user = NewUserRegistration.objects.get(email = email)
-#         serializer = profileSerializer(user, many=False)
-#         return Response(serializer.data)
-#     else:
-#         return Response({'msg':'user does not exits'})
-    
-    
-    
-    
-
 class OTP_check(APIView):
     def post(self, request):
-        ser = otpcheckserializer(data=request.data)
-        if ser.is_valid(raise_exception=True):
-            email = ser.data['email']
-            otp = ser.data['otp']
-            
-            email = ser.data['email']
+        serializer = otpcheckserializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            email = serializer.data['email']
+            otp = serializer.data['otp']
+            email = serializer.data['email']
             query  = OTP.objects.filter(verifyEmail = email)
             if not query.exists():
                 context = {'msg':'please raise otp first'}
@@ -177,9 +136,9 @@ class OTP_check(APIView):
 
 class Resend_otp(APIView):
     def post(self, request, format=None):
-        ser = resetpassserializer(data=request.data)
-        if ser.is_valid(raise_exception=True):
-            email = ser.data['email']
+        serializer = resetpassserializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            email = serializer.data['email']
 
             user = NewUserRegistration.objects.filter(email = email)
             if not user.exists():
@@ -191,7 +150,7 @@ class Resend_otp(APIView):
                 context = {'msg':'user already verified'}
                 return Response(context, status=status.HTTP_400_BAD_REQUEST)
 
-            send_otp(ser.data['email'])
+            send_otp(serializer.data['email'])
             context = {'msg':'check mail for otp'}
             return Response(context, status=status.HTTP_200_OK)
 
@@ -199,26 +158,25 @@ class Resend_otp(APIView):
 
 class Reset_password(APIView):
     def post(self, request):
-        ser = resetpassserializer(data=request.data)
-        if ser.is_valid(raise_exception=True):
-            email = ser.data['email']
+        serializer = resetpassserializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            email = serializer.data['email']
             user = NewUserRegistration.objects.filter(email = email)
             if not user.exists():
                 context = {'msg':'user does not exist'}
                 return Response(context, status=status.HTTP_400_BAD_REQUEST)
                 
-            send_otp(ser.data['email'])
+            send_otp(serializer.data['email'])
             context = {'msg':'check mail for otp'}
             return Response(context, status=status.HTTP_200_OK)
 
 class New_password(APIView):
     def post(self, request):
-        ser = passchangeserializer(data=request.data)
-        if ser.is_valid(raise_exception=True):
-            email = ser.data['email']
-            otp = ser.data['otp']
-            password = ser.data['passwordd']
-            confirm_password =ser.data['confirm_passwordd']
+        serializer = passchangeserializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            email = serializer.data['email']
+            otp = serializer.data['otp']
+            password = serializer.data['password']
 
             user = NewUserRegistration.objects.filter(email__iexact = email)
             if not user.exists():
@@ -239,17 +197,13 @@ class New_password(APIView):
                 context = {'msg':'Password entered is same as old one'}
                 return Response(context, status.HTTP_400_BAD_REQUEST)
 
-            if password == confirm_password:
-                user = user.first()
-                user.password = make_password(password)
-                user.is_verified = True
-                user.otp = random.randint(101 , 999)
-                user.save()
-                context = {'msg':'reset Successfull'}
-                return Response(context, status=status.HTTP_200_OK)
-            else:
-                context = {'msg':'password and confirm password must be same'}
-                return Response(context, status=status.HTPP_400_BAD_REQUEST)    
+            user = user.first()
+            user.password = make_password(password)
+            user.is_verified = True
+            user.otp = random.randint(101 , 999)
+            user.save()
+            context = {'msg':'reset Successfull'}
+            return Response(context, status=status.HTTP_200_OK)    
             
 class Verify_check(APIView):
         permission_classes = [IsAuthenticated,]
@@ -259,6 +213,6 @@ class Verify_check(APIView):
             if user.is_verified == True:
                 context = {'msg':'User is verified'}
                 return Response(context, status=status.HTTP_200_OK)
-            else:
-                context = {'msg':'User is not verified'}
-                return Response(context, status=status.HTTP_400_BAD_REQUEST)
+                
+            context = {'msg':'User is not verified'}
+            return Response(context, status=status.HTTP_400_BAD_REQUEST)

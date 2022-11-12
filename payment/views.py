@@ -145,7 +145,7 @@ class Flutter_Razorpay(APIView):
     def get(self, request):
         email = request.user.email
         user = NewUserRegistration.objects.get(email=email)
-        transaction_history = Order.objects.get(user_id=user.id)
+        transaction_history = Order.objects.filter(user_mail=user.id)
         serializer = OrderSerializer(transaction_history, many=True)
         return Response(serializer.data)
     
@@ -161,6 +161,9 @@ class Flutter_Razorpay(APIView):
                 serializer.save()
                 print(user.wallet)
                 user.wallet += int(serializer.data['order_amount'])
+                if user.wallet < 0:
+                    return Response({'msg':'Not enough Balance'})
+                
                 user.save()
                 print(user.wallet)
                 return Response(serializer.data)

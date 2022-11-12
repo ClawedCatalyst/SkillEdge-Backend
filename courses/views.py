@@ -11,9 +11,14 @@ from rest_framework.pagination import PageNumberPagination
 from .filters import CourseFilter
 from moviepy.editor import VideoFileClip
 import math  
+# from pymediainfo import MediaInfo
+# import cv2
+# import datetime
+# import subprocess
+# import json
 
 
-class CategoryView(APIView):
+class Category_view(APIView):
     permission_classes = [IsAuthenticated,]
     def put(self,request):
         email = request.user.email
@@ -39,7 +44,7 @@ class CategoryView(APIView):
         
         return Response(serializer.data)
         
-class CourseView(APIView):
+class Course_view(APIView):
     permission_classes = [IsAuthenticated,]
     def post(self,request):
         email = request.user.email
@@ -62,18 +67,18 @@ class CourseView(APIView):
         serializer = TopicSerializer(data, many=True)
         return Response(serializer.data) 
  
-class BasicPagination(PageNumberPagination):
+class Basic_pagination(PageNumberPagination):
     page_size_query_param = 'limit'            
 
-class ViewFilteredCourses(APIView, PaginationHandlerMixin):
+class View_filtered_courses(APIView, PaginationHandlerMixin):
     permission_classes = [IsAuthenticated,]
-    pagination_class = BasicPagination
+    pagination_class = Basic_pagination
     serializer_class = TopicSerializer
     def get(self,request):
         email = request.user.email
         user = NewUserRegistration.objects.get(email__iexact=email)
-        array = user.interested.all()
-        courses = Course.objects.filter(category__in=array)
+        user_interested_courses = user.interested.all()
+        courses = Course.objects.filter(category__in=user_interested_courses)
         
         courses = Course.objects.order_by('-rating')
         page = self.paginate_queryset(courses)
@@ -85,7 +90,7 @@ class ViewFilteredCourses(APIView, PaginationHandlerMixin):
         return Response(serializer.data)
         
         
-class CourseRating(APIView):
+class Course_rating(APIView):
     permission_classes = [IsAuthenticated,]
     def post(self,request):
         email = request.user.email
@@ -137,13 +142,13 @@ class Searching(APIView):
     
     def get(self,request):
         queryset = Course.objects.all()
-        myFilter = CourseFilter(request.GET, queryset=queryset)
-        queryset = myFilter.qs
+        my_filter = CourseFilter(request.GET, queryset=queryset)
+        queryset = my_filter.qs
         
-        searchResult = request.GET.get('search-area') or ''
+        search_result = request.GET.get('search-area') or ''
         
-        if searchResult:
-            queryset = queryset.filter(topic__icontains=searchResult)
+        if search_result:
+            queryset = queryset.filter(topic__icontains=search_result)
             
         serializer = TopicSerializer(queryset, many=True)
         
@@ -152,7 +157,7 @@ class Searching(APIView):
         
         return Response(serializer.data)  
     
-class Purchasedcourses(APIView):
+class Purchased_courses(APIView):
     permission_classes = [IsAuthenticated,]
     def get(self,request):
         email = request.user.email
@@ -163,7 +168,7 @@ class Purchasedcourses(APIView):
         return Response(ser.data)
     
 
-class LessonView(APIView):
+class Lesson_view(APIView):
     permission_classes = [IsAuthenticated,]
     
     def get(self,request):
@@ -183,33 +188,40 @@ class LessonView(APIView):
         if str(course.educator_mail) != str(email):
             return Response({'msg':'invalid'})
         
-        
-        # try:
-        print(course.educator_mail)
-        print(email)
-        if user.is_educator == True:
-                request.POST._mutable = True
-                request.data["topic"] = topic
-                request.POST._mutable = False
-                serializer = lessonSerializer(data=request.data)
-                if serializer.is_valid(raise_exception=True):
-                    serializer.save()
-                    video = VideoFileClip(str(serializer.data['file']))
-                    length = video.duration
-                    seconds = math.floor(length%60)
-                    seconds = seconds/100
-                    minutes = math.floor(length//60)
-                    lesson_id = lessons.objects.get(id=serializer.data['id'])
-                    lesson_id.length = (minutes + seconds)
-                    lesson_id.save()
+        try:
+            print(course.educator_mail)
+            print(email)
+            if user.is_educator == True:
+                    request.POST._mutable = True
+                    request.data["topic"] = topic
+                    request.POST._mutable = False
+                    serializer = lessonSerializer(data=request.data)
+                    if serializer.is_valid(raise_exception=True):
+                        serializer.save()
+                        # media_info = MediaInfo.parse(serializer.data['file'])
+                        # length = media_info.tracks[0].duration
+                        
+                        # video = VideoFileClip(str(serializer.data['file']))
+                        # print(serializer.data['file'])
+                        # length = video.duration
+                        # print(length)
+                        # seconds = math.floor(length%60)
+                        # seconds = seconds/100
+                        # minutes = math.floor(length//60)   
+                        
+                        
+                        # print(minutes+seconds)
+                    # lesson_id = lessons.objects.get(id=serializer.data['id'])
+                    # lesson_id.length = str(duration_seconds)
+                    # lesson_id.save()
                     
-                return Response({'msg':'lesson added'})    
-        return Response({'msg':'user is not an educator'})
-        # except:
-            # return Response({'msg':'invalid'}, status=status.HTTP_400_BAD_REQUEST)     
+                    return Response({'msg':'lesson added'})    
+            return Response({'msg':'user is not an educator'})
+        except:
+            return Response({'msg':'invalid'}, status=status.HTTP_400_BAD_REQUEST)     
         
     
-class ViewSpecificCourseLesson(APIView):
+class View_specific_course_lesson(APIView):
     def post(self,request):
         try:
             topic = request.data.get("topic")
@@ -221,7 +233,7 @@ class ViewSpecificCourseLesson(APIView):
         except:
             return Response({"msg":"Enter a valid course"}, status=status.HTTP_400_BAD_REQUEST)  
             
-class CourseFeedback(APIView):
+class Course_feedback(APIView):
     def get(self,request,ck):
         course = feedbackmodel.objects.filter(course = ck)
         ser = GetRatingSerializer(instance = course , many = True)

@@ -79,8 +79,6 @@ class Cart(APIView):
         # ser = TopicSerializer(instance = courselist, many = True)
         return Response(courselist)
 
-class Cart_remove(APIView):
-    permission_classes = [IsAuthenticated,]
     def delete(self,request,ck):
         email = request.user.email
         user = NewUserRegistration.objects.get(email__iexact=email)
