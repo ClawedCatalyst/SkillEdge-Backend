@@ -69,7 +69,7 @@ class NewUserRegistration(AbstractBaseUser):
     user_name = models.CharField(max_length=150, blank=True, null=True, default=None, unique=True)
     gender = models.CharField(max_length=1, choices=GENDER, blank=False,default="M")
     mobile = models.BigIntegerField(blank=True, default=91 )
-    picture = models.ImageField(upload_to="images", default="images/defaultProfilePicture.png")
+    picture = models.ImageField(upload_to="images", default="images/defaultProfilePicture_jkvski.png")
     dateOfBirth = models.DateField(blank=False,default="2022-10-10")
     wallet = models.FloatField(validators=[MinValueValidator(0)],default=0,null=True,blank=False)
     otp = models.CharField(max_length=4, blank=True, null=True)
