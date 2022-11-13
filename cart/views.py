@@ -30,35 +30,43 @@ class Cart_id(APIView):
 class Cart(APIView):
     permission_classes = [IsAuthenticated,]
     def put(self,request):
-        email = request.user.email
-        user = NewUserRegistration.objects.get(email__iexact=email)
-        course_array = user.purchasedCourse.all()
-        course_id = request.data.get("course")
-        for course in course_array:
-            # crs = Course.objects.get(topic=a)
-            # cid = crs.id
-            # print(a.id)
-            # print(ck)
-            if (course.id==int(course_id)) :
-                return Response({'msg':'course already purchased'}, status=status.HTTP_400_BAD_REQUEST)
-                # print('iterate')
-        cart_details = cart.objects.get(email__iexact =email)
-        cart_id = cart_details.id
-        request.POST._mutable = True
-        request.data["cart"] = cart_id
-        request.POST._mutable = False
-        serializer = AddCartSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            # data =request.data
-            carts=request.data.get("cart")
-            course=request.data.get("course")
-            cart_course = cart_courses.objects.filter(cart=carts,course=course)
-            l = len(cart_course)
-            if l == 0:
-                serializer.save()
-                return Response({'msg':'course added successfully to cart'})
-            else:
-                return Response({'msg':'course already added to cart'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            email = request.user.email
+            user = NewUserRegistration.objects.get(email__iexact=email)
+            course_array = user.purchasedCourse.all()
+            course_id = request.data.get("course")
+            course_details = Course.objects.get(id = course_id)
+            educator = course_details.educator_mail
+            if user.id == educator.id:
+                    return Response({'msg':'You can not buy your self hosted course '}, status=status.HTTP_400_BAD_REQUEST)
+            for course in course_array:
+                # crs = Course.objects.get(topic=a)
+                # cid = crs.id
+                # print(a.id)
+                # print(ck)
+                if (course.id==int(course_id)) :
+                    return Response({'msg':'course already purchased'}, status=status.HTTP_400_BAD_REQUEST)
+                    # print('iterate')
+            cart_details = cart.objects.get(email__iexact =email)
+            cart_id = cart_details.id
+            request.POST._mutable = True
+            request.data["cart"] = cart_id
+            request.POST._mutable = False
+            serializer = AddCartSerializer(data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                # data =request.data
+                carts=request.data.get("cart")
+                course=request.data.get("course")
+                cart_course = cart_courses.objects.filter(cart=carts,course=course)
+                l = len(cart_course)
+                if l == 0:
+                    serializer.save()
+                    return Response({'msg':'course added successfully to cart'})
+                else:
+                    return Response({'msg':'course already added to cart'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        except:
+            return Response({'msg':'Invalid method'}, status=status.HTTP_400_BAD_REQUEST)
 
     def get(self,request):
         email = request.user.email
