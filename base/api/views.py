@@ -176,7 +176,7 @@ class New_password(APIView):
         if serializer.is_valid(raise_exception=True):
             email = serializer.data['email']
             otp = serializer.data['otp']
-            password = serializer.data['password']
+            password = serializer.data['passwordd']
 
             user = NewUserRegistration.objects.filter(email__iexact = email)
             if not user.exists():
