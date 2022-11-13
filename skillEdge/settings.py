@@ -54,7 +54,6 @@ INSTALLED_APPS = [
     'cloudinary_storage',
     'cloudinary',
 ]
-# AUTH_USER_MODEL='courses.Course'
 INTEREST = 'courses.Course'
 
 CLOUDINARY_STORAGE = {
@@ -226,4 +225,3 @@ CSRF_TRUSTED_ORIGINS = [
 ]
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-# DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.VideoMediaCloudinaryStorage'
