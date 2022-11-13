@@ -151,7 +151,7 @@ class Resend_otp(APIView):
                 return Response(context, status=status.HTTP_400_BAD_REQUEST)
 
             send_otp(serializer.data['email'])
-            context = {'msg':'check mail for otp'}
+            context = {'msg':'Check Mail for OTP'}
             return Response(context, status=status.HTTP_200_OK)
 
 
