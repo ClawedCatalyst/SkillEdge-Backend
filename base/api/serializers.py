@@ -39,4 +39,4 @@ class resetpassserializer(serializers.Serializer):
 class passchangeserializer(serializers.Serializer):
     email = serializers.EmailField()
     otp = serializers.CharField()
-    password = serializers.CharField()
+    passwordd = serializers.CharField()
