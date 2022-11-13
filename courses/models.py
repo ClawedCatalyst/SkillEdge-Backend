@@ -1,6 +1,5 @@
 import imp
 from django.db import models
-# from django.contrib.auth.models import User
 from django.db.models.deletion import CASCADE
 from base.models import interests,NewUserRegistration
 from django.core.validators import MaxValueValidator , MinValueValidator , EmailValidator
@@ -38,7 +37,7 @@ class lessons(models.Model):
     
     
     def __str__(self):
-        return str(self.topic)
+        return str(self.topic) + " - " + str(self.lessonName[0:25])
 
 class feedbackmodel(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE,null=True)

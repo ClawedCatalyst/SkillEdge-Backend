@@ -139,7 +139,7 @@ class Course_rating(APIView):
             return Response({'msg':'enter valid details'})
 
 class Searching(APIView):
-    
+    permission_classes = [IsAuthenticated,]
     def get(self,request):
         queryset = Course.objects.all()
         my_filter = CourseFilter(request.GET, queryset=queryset)

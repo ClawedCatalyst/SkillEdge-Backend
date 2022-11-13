@@ -162,11 +162,11 @@ class Flutter_Razorpay(APIView):
                 print(user.wallet)
                 user.wallet += int(serializer.data['order_amount'])
                 if user.wallet < 0:
-                    return Response({'msg':'Not enough Balance'})
+                    return Response({'msg':'Not enough Balance'}, status=status.HTTP_400_BAD_REQUEST)
                 
                 user.save()
                 print(user.wallet)
                 return Response(serializer.data)
         except:
-            return Response({"msg":"Payment Failed"})    
+            return Response({"msg":"Payment Failed"}, status=status.HTTP_400_BAD_REQUEST)    
         
