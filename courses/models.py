@@ -44,6 +44,7 @@ class feedbackmodel(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE,null=True)
     sender = models.ForeignKey(NewUserRegistration,on_delete=models.CASCADE,null=True)
     latest_review = models.PositiveIntegerField(validators=[MaxValueValidator(5),MinValueValidator(1)],default=0)
+    user = models.CharField(max_length=200,default = " ")
     comment = models.CharField(max_length=100,default=" ")
     time = models.DateTimeField(auto_now_add=True)
 

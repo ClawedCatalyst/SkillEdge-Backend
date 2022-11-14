@@ -91,8 +91,7 @@ class View_filtered_courses(APIView, PaginationHandlerMixin):
             serializer = self.serializer_class(courses, many=True)
         
         return Response(serializer.data)
-        
-        
+
 class Course_rating(APIView):
     permission_classes = [IsAuthenticated,]
     def post(self,request):
@@ -109,7 +108,7 @@ class Course_rating(APIView):
         if seri.is_valid(raise_exception=True):
             seri.save()
             # ck = feedbackmodel.objects.latest('time')
-            course= request.data.get('course')
+            course= request.data["course"]
             count = course.review_count
             rating = course.rating
             rating_serializer = RatingSerializer(instance = course,data=request.data)

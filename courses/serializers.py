@@ -30,7 +30,7 @@ class RatingSerializer(ModelSerializer):
 class GetRatingSerializer(ModelSerializer):
     class Meta:
         model = feedbackmodel
-        fields = ['course','latest_review','comment','sender']
+        fields = ['course','latest_review','comment','sender','user']
 
         extra_kwargs = {'course': {'required': True},'latest_review': {'required': False}}
 
