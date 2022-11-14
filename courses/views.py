@@ -45,7 +45,7 @@ class Category_view(APIView):
         return Response(serializer.data)
         
 class Course_view(APIView):
-    
+
     def get(self,request):
         data = Course.objects.all()
         data = Course.objects.order_by('-rating')
@@ -108,36 +108,36 @@ class Course_rating(APIView):
         seri = GetRatingSerializer(data=request.data)
         if seri.is_valid(raise_exception=True):
             seri.save()
-            ck = feedbackmodel.objects.latest('time')
-            course=ck.course
+            # ck = feedbackmodel.objects.latest('time')
+            course= request.data.get('course')
             count = course.review_count
             rating = course.rating
-            ser = RatingSerializer(instance = course,data=request.data)
-            if ser.is_valid(raise_exception=True):
-                ser.save()
+            rating_serializer = RatingSerializer(instance = course,data=request.data)
+            if rating_serializer.is_valid(raise_exception=True):
+                rating_serializer.save()
                 review = course.latest_review
                 # return Response(check)
                 if count == 0:
-                    ser = RatingSerializer(instance = course,data=request.data)
-                    if ser.is_valid(raise_exception=True):
+                    rating_serializer = RatingSerializer(instance = course,data=request.data)
+                    if rating_serializer.is_valid(raise_exception=True):
                         course.rating = review
                         course.review_count = 1
-                        ser.save()
+                        rating_serializer.save()
                         return Response({'msg':'Thanks for your review'})
                 else:
                     present_rating = rating*count
                     new_rating = (present_rating + review)/(count + 1)
                     count+=1
                     course.review_count = count
-                    ser = RatingSerializer(instance = course,data=request.data)
-                    if ser.is_valid(raise_exception=True):
+                    rating_serializer = RatingSerializer(instance = course,data=request.data)
+                    if rating_serializer.is_valid(raise_exception=True):
                         course.rating = new_rating
-                        ser.save()
+                        rating_serializer.save()
                         return Response({'msg':'Thanks for your review'})
                 return Response({'msg':'Something went wrong'})
-            # ser = RatingSerializer(instance = course,data=request.data)
-            # if ser.is_valid(raise_exception=True):
-            #     ser.save()
+            # rating_serializer = RatingSerializer(instance = course,data=request.data)
+            # if rating_serializer.is_valid(raise_exception=True):
+            #     rating_serializer.save()
             #     return Response(rating)
             return Response({'msg':'enter valid details'})
 
@@ -167,8 +167,8 @@ class Purchased_courses(APIView):
         user = NewUserRegistration.objects.get(email__iexact=email)
         array = user.purchasedCourse.all()
         courses = Course.objects.filter(id__in=array)
-        ser = TopicSerializer(courses, many=True)
-        return Response(ser.data)
+        topic_serializer = TopicSerializer(courses, many=True)
+        return Response(topic_serializer.data)
     
 
 class Lesson_view(APIView):
@@ -239,5 +239,5 @@ class View_specific_course_lesson(APIView):
 class Course_feedback(APIView):
     def get(self,request,ck):
         course = feedbackmodel.objects.filter(course = ck)
-        ser = GetRatingSerializer(instance = course , many = True)
-        return Response(ser.data)
+        rating_serializer = GetRatingSerializer(instance = course , many = True)
+        return Response(rating_serializer.data)
