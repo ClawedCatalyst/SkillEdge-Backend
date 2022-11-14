@@ -50,13 +50,12 @@ class List_of_registered_user(APIView):
 class New_user_registration(APIView): 
     def post(self, request,):
         password = request.data.get("password",)
-        print(password)
         serializer = NewUserSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             try:
                 validate_password(password)
             except:
-                return Response({"msg":"Password needs to be more than 8 characters"})    
+                return Response({"msg":"Password needs to be more than 8 characters, contains at least 1 uppercase, 1 lowercase, 1 number and 1 special character"})    
             
             serializer.save()
             email = serializer.data['email']

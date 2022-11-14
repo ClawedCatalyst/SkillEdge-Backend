@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     "corsheaders",
     'cloudinary_storage',
     'cloudinary',
+    'django_password_validators',
 ]
 INTEREST = 'courses.Course'
 
@@ -181,6 +182,16 @@ AUTH_PASSWORD_VALIDATORS = [
     },
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+     {
+        'NAME': 'django_password_validators.password_character_requirements.password_validation.PasswordCharacterValidator',
+        'OPTIONS': {
+             'min_length_digit': 1,
+             'min_length_special': 1,
+             'min_length_lower': 1,
+             'min_length_upper': 1,
+             'special_characters': "~!@#$%^&*()_+{}\":;'[]"
+         }
     },
 ]
 
