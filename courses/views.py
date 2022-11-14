@@ -58,11 +58,16 @@ class Course_view(APIView):
     def post(self,request):
         email = request.user.email
         user = NewUserRegistration.objects.get(email__iexact=email)
-        request.POST._mutable = True
-        request.data["educator_mail"] = request.user.id
-        request.data["educator_name"] = user.name
-        request.POST._mutable = False
         if user.is_educator == True:
+            all_courses = Course.objects.filter(educator_mail = request.user.id)
+            total_weighted_rating = 0.0
+            for each_course in all_courses:
+                total_weighted_rating += each_course.weighted_rating
+            avg_weighted_rating = total_weighted_rating/len(all_courses)
+            request.POST._mutable = True
+            request.data["educator_mail"] = request.user.id
+            request.data["educator_name"] = user.name
+            request.POST._mutable = False
             serializer = TopicSerializer(data=request.data)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
