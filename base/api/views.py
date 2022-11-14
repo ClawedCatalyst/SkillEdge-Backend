@@ -4,6 +4,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate
 from rest_framework.permissions import IsAuthenticated
+from django.contrib.auth.password_validation import validate_password
 from django.utils import timezone
 from .serializers import *
 from .mail import *
@@ -11,6 +12,7 @@ from base.models import *
 from cart.serializers import *
 from datetime import datetime, timedelta
 from django.contrib.auth.hashers import make_password
+from django.conf import settings
 
 
 def getTokens(user):
@@ -47,14 +49,21 @@ class List_of_registered_user(APIView):
         
 class New_user_registration(APIView): 
     def post(self, request,):
+        password = request.data.get("password",)
+        print(password)
         serializer = NewUserSerializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
+            try:
+                validate_password(password)
+            except:
+                return Response({"msg":"Password needs to be more than 8 characters"})    
+            
             serializer.save()
             email = serializer.data['email']
             send_otp(email)
             user = NewUserRegistration.objects.get(email=email)
             # user_id = NewUserRegistration.objects.get(email=email).id
-            # print(user_id)
+            # print(user_id)    
             token = getTokens(user)
             context = {'msg':'Registration Successfull', 'token':token}
             request.data['user']= user.id
