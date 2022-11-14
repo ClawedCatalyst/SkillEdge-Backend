@@ -5,7 +5,7 @@ def calculate_weighted_rating(course):
     avg_rating = course.rating
     all_courses = Course.objects.all()
     total_rating = 0.0
-    for each_course in courses:
+    for each_course in all_courses:
         total_rating += each_course.rating
     default_votes = 20
     cummulative_rating = total_rating/len(all_courses)

@@ -11,6 +11,7 @@ from rest_framework.pagination import PageNumberPagination
 from .filters import CourseFilter
 from moviepy.editor import VideoFileClip
 import math  
+from .rating import calculate_weighted_rating
 # from pymediainfo import MediaInfo
 # import cv2
 # import datetime
@@ -106,11 +107,12 @@ class Course_rating(APIView):
         request.POST._mutable = False
         seri = GetRatingSerializer(data=request.data)
         if seri.is_valid(raise_exception=True):
-            seri.save()
             # ck = feedbackmodel.objects.latest('time')
-            course= request.data["course"]
+            course_id= request.data.get("course")
+            course= Course.objects.get(id=course_id)
             count = course.review_count
             rating = course.rating
+            seri.save()
             rating_serializer = RatingSerializer(instance = course,data=request.data)
             if rating_serializer.is_valid(raise_exception=True):
                 rating_serializer.save()
@@ -122,6 +124,7 @@ class Course_rating(APIView):
                         course.rating = review
                         course.review_count = 1
                         rating_serializer.save()
+                        course.weighted_rating = calculate_weighted_rating(course)
                         return Response({'msg':'Thanks for your review'})
                 else:
                     present_rating = rating*count
@@ -132,6 +135,7 @@ class Course_rating(APIView):
                     if rating_serializer.is_valid(raise_exception=True):
                         course.rating = new_rating
                         rating_serializer.save()
+                        course.weighted_rating = calculate_weighted_rating(course)
                         return Response({'msg':'Thanks for your review'})
                 return Response({'msg':'Something went wrong'})
             # rating_serializer = RatingSerializer(instance = course,data=request.data)
