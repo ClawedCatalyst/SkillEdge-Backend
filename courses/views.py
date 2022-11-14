@@ -45,6 +45,14 @@ class Category_view(APIView):
         return Response(serializer.data)
         
 class Course_view(APIView):
+    
+    def get(self,request):
+        data = Course.objects.all()
+        data = Course.objects.order_by('-rating')
+        serializer = TopicSerializer(data, many=True)
+        return Response(serializer.data) 
+
+
     permission_classes = [IsAuthenticated,]
     def post(self,request):
         email = request.user.email
@@ -61,11 +69,6 @@ class Course_view(APIView):
         else:
             return Response({'msg':'user is not an educator'})   
 
-    def get(self,request):
-        data = Course.objects.all()
-        data = Course.objects.order_by('-rating')
-        serializer = TopicSerializer(data, many=True)
-        return Response(serializer.data) 
  
 class Basic_pagination(PageNumberPagination):
     page_size_query_param = 'limit'            

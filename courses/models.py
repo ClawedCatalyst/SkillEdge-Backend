@@ -22,6 +22,7 @@ class Course(models.Model):
     review_count = models.PositiveIntegerField(null=True, default=0)
     latest_review = models.PositiveIntegerField(validators=[MaxValueValidator(5),MinValueValidator(0)],default=0)
     rating = models.FloatField(validators=[MaxValueValidator(5),MinValueValidator(0)],default=0)
+    weighted_rating = models.FloatField(default=0)
 
     def __str__(self):
         return self.topic
