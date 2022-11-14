@@ -123,8 +123,8 @@ class Course_rating(APIView):
                     if rating_serializer.is_valid(raise_exception=True):
                         course.rating = review
                         course.review_count = 1
-                        rating_serializer.save()
                         course.weighted_rating = calculate_weighted_rating(course)
+                        rating_serializer.save()
                         return Response({'msg':'Thanks for your review'})
                 else:
                     present_rating = rating*count
@@ -134,8 +134,8 @@ class Course_rating(APIView):
                     rating_serializer = RatingSerializer(instance = course,data=request.data)
                     if rating_serializer.is_valid(raise_exception=True):
                         course.rating = new_rating
-                        rating_serializer.save()
                         course.weighted_rating = calculate_weighted_rating(course)
+                        rating_serializer.save()
                         return Response({'msg':'Thanks for your review'})
                 return Response({'msg':'Something went wrong'})
             # rating_serializer = RatingSerializer(instance = course,data=request.data)
