@@ -78,6 +78,7 @@ class NewUserRegistration(AbstractBaseUser):
     educator_rating = models.FloatField(default=0)
 
     is_educator = models.BooleanField(default=False)
+    is_certified_educator = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
