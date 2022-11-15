@@ -72,7 +72,7 @@ class NewUserRegistration(AbstractBaseUser):
     picture = models.ImageField(upload_to="images", default="images/defaultProfilePicture_jkvski.png")
     dateOfBirth = models.DateField(blank=False,default="2022-10-10")
     wallet = models.FloatField(validators=[MinValueValidator(0)],default=0,null=True,blank=False)
-    otp = models.CharField(max_length=4, blank=True, null=True)
+    # otp = models.CharField(max_length=4, blank=True, null=True)
     interested = models.ManyToManyField(interests)
     purchasedCourse = models.ManyToManyField(settings.INTEREST)
     educator_rating = models.FloatField(default=0)
@@ -108,10 +108,17 @@ class NewUserRegistration(AbstractBaseUser):
         return self.is_admin
     
 class OTP(models.Model):
-     verifyEmail = models.EmailField(max_length=255,default=True)
+     email = models.EmailField(verbose_name='email address',
+        max_length=255,
+        unique=True,
+        validators=[EmailValidator()], null=True)
+     name = models.CharField(max_length=150, default=None, null=True)
+     user_name = models.CharField(max_length=150, blank=True, null=True, default=None, unique=True)
+     password = models.CharField(max_length=100, null=True)
+     otp = models.CharField(max_length=4, blank=True, null=True)
      time_created = models.DateTimeField(default=timezone.now)
      
      def __str__(self):
-         return self.time_created
+         return self.email
      
  
