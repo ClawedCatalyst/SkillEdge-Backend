@@ -120,9 +120,11 @@ class Course_rating(APIView):
     def post(self,request):
         email = request.user.email
         user = NewUserRegistration.objects.get(email__iexact=email)
+        check_status = 0
         history = feedbackmodel.objects.filter(user = user.name,course=request.data.get('course'))
         if len(history)!=0:
-            return Response({'msg':'you already gave your review for this course'})
+            check_status = 1
+            history.delete()
         request.POST._mutable = True
         request.data["sender"] = user.id
         request.data["user"] = user.name
@@ -147,7 +149,10 @@ class Course_rating(APIView):
                         course.review_count = 1
                         course.weighted_rating = calculate_weighted_rating(course)
                         rating_serializer.save()
-                        return Response({'msg':'Thanks for your review'})
+                        if check_status == 0:
+                            return Response({'msg':'Thanks for your review'})
+                        if check_status == 1:
+                            return Response({'msg':'Review edited: Thanks for your review'})
                 else:
                     present_rating = rating*count
                     new_rating = (present_rating + review)/(count + 1)
@@ -158,7 +163,10 @@ class Course_rating(APIView):
                         course.rating = new_rating
                         course.weighted_rating = calculate_weighted_rating(course)
                         rating_serializer.save()
-                        return Response({'msg':'Thanks for your review'})
+                        if check_status == 0:
+                            return Response({'msg':'Thanks for your review'})
+                        if check_status == 1:
+                            return Response({'msg':'Review edited: Thanks for your review'})
                 return Response({'msg':'Something went wrong'})
             # rating_serializer = RatingSerializer(instance = course,data=request.data)
             # if rating_serializer.is_valid(raise_exception=True):
