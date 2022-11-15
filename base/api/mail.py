@@ -4,6 +4,7 @@ import random
 from django.conf import settings
 from django.utils import timezone
 from base.models import *
+from django.utils import timezone
 
 def send_otp(email):
     subject = "Here's your account verification mail"
