@@ -50,8 +50,16 @@ class List_of_registered_user(APIView):
         
 class New_user_registration(APIView): 
     def post(self, request,):
+        email = request.data.get("email")
         password = request.data.get("password")
         serializer = Verify_OTP_serializer(data=request.data)
+        
+        userOTP = OTP.objects.filter(email=email)
+        user = NewUserRegistration.objects.filter(email=email)
+        
+        if userOTP.exists() and not user.exists():
+            userOTP.delete()
+        
         if serializer.is_valid(raise_exception=True):
             try: 
                 validate_password(password)
@@ -139,11 +147,7 @@ class Resend_otp(APIView):
             if not userOTP.exists():
                 context = {'msg':'OTP for requested user does not exists'}
                 return Response(context, status=status.HTTP_400_BAD_REQUEST)
-
-            # user = NewUserRegistration.objects.get(email = email)
-            # if user.is_verified == True:
-            #     context = {'msg':'user already verified'}
-            #     return Response(context, status=status.HTTP_400_BAD_REQUEST)
+            
 
             send_otp(serializer.data['email'])
             context = {'msg':'Check Mail for OTP'}
