@@ -13,7 +13,7 @@ from courses.serializers import *
 class BecomeEducator(APIView):
     permission_classes = [IsAuthenticated,]
     def put(self, request):
-        email = request.educator.email
+        email = request.user.email
         educator = NewUserRegistration.objects.get(email__iexact=email)
         
         if educator.is_verified == True:
