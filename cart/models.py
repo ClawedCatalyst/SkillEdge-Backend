@@ -33,10 +33,10 @@ def addcourse(sender, **kwargs):
     cart_item = kwargs['instance']
     course = Course.objects.get(id=cart_item.course.id)
     cart_item.price = course.price
-    pk = cart_item.cart.id
-    cart_v = cart.objects.get(id = pk)
-    cart_tp = cart_v.total_price
-    cart_v.total_price = course.price + cart_tp
-    cart_v.save()
+    cart_id = cart_item.cart.id
+    cart_details = cart.objects.get(id = cart_id)
+    cart_totalprice = cart_details.total_price
+    cart_details.total_price = course.price + cart_totalprice
+    cart_details.save()
     print(cart_item)
     

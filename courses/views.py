@@ -11,6 +11,7 @@ from rest_framework.pagination import PageNumberPagination
 from .filters import CourseFilter
 from moviepy.editor import VideoFileClip
 import math  
+from .rating import calculate_weighted_rating
 # from pymediainfo import MediaInfo
 # import cv2
 # import datetime
@@ -45,15 +46,28 @@ class Category_view(APIView):
         return Response(serializer.data)
         
 class Course_view(APIView):
+
+    def get(self,request):
+        data = Course.objects.all()
+        data = Course.objects.order_by('-weighted_rating')
+        serializer = TopicSerializer(data, many=True)
+        return Response(serializer.data) 
+
+
     permission_classes = [IsAuthenticated,]
     def post(self,request):
         email = request.user.email
         user = NewUserRegistration.objects.get(email__iexact=email)
-        request.POST._mutable = True
-        request.data["educator_mail"] = request.user.id
-        request.data["educator_name"] = user.name
-        request.POST._mutable = False
         if user.is_educator == True:
+            all_courses = Course.objects.filter(educator_mail = request.user.id)
+            total_weighted_rating = 0.0
+            for each_course in all_courses:
+                total_weighted_rating += each_course.weighted_rating
+            avg_weighted_rating = total_weighted_rating/len(all_courses)
+            request.POST._mutable = True
+            request.data["educator_mail"] = request.user.id
+            request.data["educator_name"] = user.name
+            request.POST._mutable = False
             serializer = TopicSerializer(data=request.data)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
@@ -61,11 +75,6 @@ class Course_view(APIView):
         else:
             return Response({'msg':'user is not an educator'})   
 
-    def get(self,request):
-        data = Course.objects.all()
-        data = Course.objects.order_by('-rating')
-        serializer = TopicSerializer(data, many=True)
-        return Response(serializer.data) 
  
 class Basic_pagination(PageNumberPagination):
     page_size_query_param = 'limit'            
@@ -80,7 +89,7 @@ class View_filtered_courses(APIView, PaginationHandlerMixin):
         user_interested_courses = user.interested.all()
         courses = Course.objects.filter(category__in=user_interested_courses)
         
-        courses = Course.objects.order_by('-rating')
+        courses = Course.objects.order_by('-weighted_rating')
         page = self.paginate_queryset(courses)
         if page is not None:
             serializer = self.get_paginated_response(self.serializer_class(page,many=True).data)
@@ -88,8 +97,7 @@ class View_filtered_courses(APIView, PaginationHandlerMixin):
             serializer = self.serializer_class(courses, many=True)
         
         return Response(serializer.data)
-        
-        
+
 class Course_rating(APIView):
     permission_classes = [IsAuthenticated,]
     def post(self,request):
@@ -104,37 +112,40 @@ class Course_rating(APIView):
         request.POST._mutable = False
         seri = GetRatingSerializer(data=request.data)
         if seri.is_valid(raise_exception=True):
-            seri.save()
-            ck = feedbackmodel.objects.latest('time')
-            course=ck.course
+            # ck = feedbackmodel.objects.latest('time')
+            course_id= request.data.get("course")
+            course= Course.objects.get(id=course_id)
             count = course.review_count
             rating = course.rating
-            ser = RatingSerializer(instance = course,data=request.data)
-            if ser.is_valid(raise_exception=True):
-                ser.save()
+            seri.save()
+            rating_serializer = RatingSerializer(instance = course,data=request.data)
+            if rating_serializer.is_valid(raise_exception=True):
+                rating_serializer.save()
                 review = course.latest_review
                 # return Response(check)
                 if count == 0:
-                    ser = RatingSerializer(instance = course,data=request.data)
-                    if ser.is_valid(raise_exception=True):
+                    rating_serializer = RatingSerializer(instance = course,data=request.data)
+                    if rating_serializer.is_valid(raise_exception=True):
                         course.rating = review
                         course.review_count = 1
-                        ser.save()
+                        course.weighted_rating = calculate_weighted_rating(course)
+                        rating_serializer.save()
                         return Response({'msg':'Thanks for your review'})
                 else:
                     present_rating = rating*count
                     new_rating = (present_rating + review)/(count + 1)
                     count+=1
                     course.review_count = count
-                    ser = RatingSerializer(instance = course,data=request.data)
-                    if ser.is_valid(raise_exception=True):
+                    rating_serializer = RatingSerializer(instance = course,data=request.data)
+                    if rating_serializer.is_valid(raise_exception=True):
                         course.rating = new_rating
-                        ser.save()
+                        course.weighted_rating = calculate_weighted_rating(course)
+                        rating_serializer.save()
                         return Response({'msg':'Thanks for your review'})
                 return Response({'msg':'Something went wrong'})
-            # ser = RatingSerializer(instance = course,data=request.data)
-            # if ser.is_valid(raise_exception=True):
-            #     ser.save()
+            # rating_serializer = RatingSerializer(instance = course,data=request.data)
+            # if rating_serializer.is_valid(raise_exception=True):
+            #     rating_serializer.save()
             #     return Response(rating)
             return Response({'msg':'enter valid details'})
 
@@ -164,8 +175,8 @@ class Purchased_courses(APIView):
         user = NewUserRegistration.objects.get(email__iexact=email)
         array = user.purchasedCourse.all()
         courses = Course.objects.filter(id__in=array)
-        ser = TopicSerializer(courses, many=True)
-        return Response(ser.data)
+        topic_serializer = TopicSerializer(courses, many=True)
+        return Response(topic_serializer.data)
     
 
 class Lesson_view(APIView):
@@ -236,5 +247,5 @@ class View_specific_course_lesson(APIView):
 class Course_feedback(APIView):
     def get(self,request,ck):
         course = feedbackmodel.objects.filter(course = ck)
-        ser = GetRatingSerializer(instance = course , many = True)
-        return Response(ser.data)
+        rating_serializer = GetRatingSerializer(instance = course , many = True)
+        return Response(rating_serializer.data)

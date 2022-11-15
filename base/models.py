@@ -75,8 +75,10 @@ class NewUserRegistration(AbstractBaseUser):
     otp = models.CharField(max_length=4, blank=True, null=True)
     interested = models.ManyToManyField(interests)
     purchasedCourse = models.ManyToManyField(settings.INTEREST)
+    educator_rating = models.FloatField(default=0)
 
     is_educator = models.BooleanField(default=False)
+    is_certified_educator = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)

@@ -22,6 +22,7 @@ class Course(models.Model):
     review_count = models.PositiveIntegerField(null=True, default=0)
     latest_review = models.PositiveIntegerField(validators=[MaxValueValidator(5),MinValueValidator(0)],default=0)
     rating = models.FloatField(validators=[MaxValueValidator(5),MinValueValidator(0)],default=0)
+    weighted_rating = models.FloatField(default=0)
 
     def __str__(self):
         return self.topic
@@ -43,7 +44,7 @@ class feedbackmodel(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE,null=True)
     sender = models.ForeignKey(NewUserRegistration,on_delete=models.CASCADE,null=True)
     latest_review = models.PositiveIntegerField(validators=[MaxValueValidator(5),MinValueValidator(1)],default=0)
-    user = models.CharField(max_length=200,null=True,blank=True)
+    user = models.CharField(max_length=200,default = " ")
     comment = models.CharField(max_length=100,default=" ")
     time = models.DateTimeField(auto_now_add=True)
 
