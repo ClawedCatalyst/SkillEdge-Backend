@@ -1,3 +1,4 @@
+import email
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -49,28 +50,34 @@ class List_of_registered_user(APIView):
         
 class New_user_registration(APIView): 
     def post(self, request,):
-        password = request.data.get("password",)
-        serializer = NewUserSerializer(data=request.data)
+        email = request.data.get("email")
+        password = request.data.get("password")
+        serializer = Verify_OTP_serializer(data=request.data)
+        
+        userOTP = OTP.objects.filter(email=email)
+        user = NewUserRegistration.objects.filter(email=email)
+        
+        if userOTP.exists() and not user.exists():
+            userOTP.delete()
+        
         if serializer.is_valid(raise_exception=True):
-            try:
+            try: 
                 validate_password(password)
             except:
-                return Response({"msg":"Password needs to be more than 8 characters, contains at least 1 uppercase, 1 lowercase, 1 number and 1 special character"})    
+                return Response({"msg":"Password needs to be more than 8 characters, contains at least 1 uppercase, 1 lowercase, 1 number and 1 special character"},
+                                status=status.HTTP_400_BAD_REQUEST)   
             
             serializer.save()
-            email = serializer.data['email']
-            send_otp(email)
-            user = NewUserRegistration.objects.get(email=email)
-            # user_id = NewUserRegistration.objects.get(email=email).id
-            # print(user_id)    
-            token = getTokens(user)
-            context = {'msg':'Registration Successfull', 'token':token}
-            request.data['user']= user.id
-            serializer = CartSerializer(data=request.data)
-            if serializer.is_valid(raise_exception=True):
-                serializer.save()
-                return Response(context, status=status.HTTP_200_OK)
-        return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
+            OTP_send = OTP.objects.get(email=serializer.data["email"])
+            OTP_send.password = make_password(password)
+            OTP_send.save()
+            print(OTP_send.otp)
+            send_otp(OTP_send.email)
+            
+            return Response({'msg':'Please check mail for OTP'}, status=status.HTTP_200_OK)
+            
+        
+        
     
 class Profile_details(APIView):
         permission_classes = [IsAuthenticated,]
@@ -103,26 +110,15 @@ class OTP_check(APIView):
         if serializer.is_valid(raise_exception=True):
             email = serializer.data['email']
             otp = serializer.data['otp']
-            email = serializer.data['email']
-            query  = OTP.objects.filter(verifyEmail = email)
-            if not query.exists():
-                context = {'msg':'please raise otp first'}
-                return Response(context, status=status.HTTP_400_BAD_REQUEST)
 
-            
-            userOTP = OTP.objects.get(verifyEmail__iexact = email)
-            print(userOTP.time_created)
-            
-            user = NewUserRegistration.objects.filter(email = email)
-            if not user.exists():
-                context = {'msg':'user does not exist'}
-                return Response(context, status=status.HTTP_400_BAD_REQUEST)
 
-            if not len(user[0].otp) == 4:
+            userOTP = OTP.objects.get(email = email)
+
+            if not len(userOTP.otp) == 4:
                 context = {'msg':'generate new otp request'}
                 return Response(context, status=status.HTTP_400_BAD_REQUEST)
 
-            if not user[0].otp == otp:
+            if not userOTP.otp == otp:
                 context = {'msg':'otp is not valid'}
                 return Response(context, status=status.HTTP_400_BAD_REQUEST)
             
@@ -132,13 +128,12 @@ class OTP_check(APIView):
                 return Response(message,status=status.HTTP_400_BAD_REQUEST)    
             
 
-
-            user = user.first()
-            user.is_verified = True
-            user.otp = random.randint(101 , 999)
+            NewUserRegistration.objects.create(name = userOTP.name, user_name = userOTP.user_name, email = userOTP.email, password = userOTP.password)
+            user = NewUserRegistration.objects.get(email=userOTP.email)
+            user.is_verified = True;
+            userOTP.otp = random.randint(101 , 999)
             user.save()
-            
-
+            userOTP.save()
             context = {'msg':'verification Successfull'}
             return Response(context, status=status.HTTP_200_OK)
 
@@ -148,15 +143,11 @@ class Resend_otp(APIView):
         if serializer.is_valid(raise_exception=True):
             email = serializer.data['email']
 
-            user = NewUserRegistration.objects.filter(email = email)
-            if not user.exists():
-                context = {'msg':'user not registered'}
+            userOTP = OTP.objects.filter(email = email)
+            if not userOTP.exists():
+                context = {'msg':'OTP for requested user does not exists'}
                 return Response(context, status=status.HTTP_400_BAD_REQUEST)
-
-            user = NewUserRegistration.objects.get(email = email)
-            if user.is_verified == True:
-                context = {'msg':'user already verified'}
-                return Response(context, status=status.HTTP_400_BAD_REQUEST)
+            
 
             send_otp(serializer.data['email'])
             context = {'msg':'Check Mail for OTP'}
@@ -187,15 +178,16 @@ class New_password(APIView):
             password = serializer.data['passwordd']
 
             user = NewUserRegistration.objects.filter(email__iexact = email)
+            userOTP = OTP.objects.get(email=email)
             if not user.exists():
                 context = {'msg':'user does not exist'}
                 return Response(context, status=status.HTTP_400_BAD_REQUEST)
 
-            if not len(user[0].otp) == 4:
+            if not len(userOTP.otp) == 4:
                 context = {'msg':'generate new otp request'}
                 return Response(context, status=status.HTTP_400_BAD_REQUEST)
 
-            if not user[0].otp == otp:
+            if not userOTP.otp == otp:
                 context = {'msg':'otp is not valid'}
                 return Response(context, status=status.HTTP_400_BAD_REQUEST)  
             
@@ -207,9 +199,9 @@ class New_password(APIView):
 
             user = user.first()
             user.password = make_password(password)
-            user.is_verified = True
-            user.otp = random.randint(101 , 999)
+            userOTP.otp = random.randint(101 , 999)
             user.save()
+            userOTP.save()
             context = {'msg':'reset Successfull'}
             return Response(context, status=status.HTTP_200_OK)    
             

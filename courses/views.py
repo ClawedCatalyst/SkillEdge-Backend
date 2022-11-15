@@ -63,10 +63,13 @@ class Course_view(APIView):
             total_weighted_rating = 0.0
             for each_course in all_courses:
                 total_weighted_rating += each_course.weighted_rating
-            avg_weighted_rating = total_weighted_rating/len(all_courses)
+            if len(all_courses) == 0:
+                avg_weighted_rating=0
+            else:
+                avg_weighted_rating = total_weighted_rating/len(all_courses)
             user.educator_rating = avg_weighted_rating
             user.save()
-            if avg_weighted_rating > 2.5:
+            if avg_weighted_rating >= 2.5:
                 user.is_certified_educator = True
                 user.save()
                 request.POST._mutable = True
