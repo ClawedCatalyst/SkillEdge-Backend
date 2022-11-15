@@ -13,7 +13,7 @@ from base.models import *
 from cart.serializers import *
 from datetime import datetime, timedelta
 from django.contrib.auth.hashers import make_password
-from django.conf import settings
+
 
 
 def getTokens(user):
@@ -106,6 +106,7 @@ class Profile_details(APIView):
     
 class OTP_check(APIView):
     def post(self, request):
+        
         serializer = otpcheckserializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             email = serializer.data['email']
@@ -130,8 +131,9 @@ class OTP_check(APIView):
 
             NewUserRegistration.objects.create(name = userOTP.name, user_name = userOTP.user_name, email = userOTP.email, password = userOTP.password)
             user = NewUserRegistration.objects.get(email=userOTP.email)
-            user.is_verified = True;
+            user.is_verified = True
             userOTP.otp = random.randint(101 , 999)
+            userOTP.is_verified = True
             user.save()
             userOTP.save()
             context = {'msg':'verification Successfull'}

@@ -116,6 +116,7 @@ class OTP(models.Model):
      user_name = models.CharField(max_length=150, blank=True, null=True, default=None, unique=True)
      password = models.CharField(max_length=100, null=True)
      otp = models.CharField(max_length=4, blank=True, null=True)
+     is_verified = models.BooleanField(default=False)
      time_created = models.DateTimeField(default=timezone.now)
      
      def __str__(self):
