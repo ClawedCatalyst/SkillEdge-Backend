@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'cart.apps.CartConfig',
     'payment.apps.PaymentConfig',
     
+    # 'background_task',
     'rest_framework',
     'django_filters',
     'rest_framework_simplejwt.token_blacklist',

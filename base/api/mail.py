@@ -3,6 +3,7 @@ from django.core.mail import EmailMultiAlternatives
 import random
 from django.conf import settings
 from base.models import *
+from django.utils import timezone
 
 def send_otp(email):
     subject = "Here's your account verification mail"
@@ -18,4 +19,8 @@ def send_otp(email):
     OTP.objects.create(verifyEmail = user,time_created = timezone.now()) 
     user.otp = otp
     user.save()
+    # comparision_time = timezone.now() - timedelta(minutes=3)
+    # otp_record = OTP.objects.filter(time_created__gte = comparision_time)
+    # for each_record in otp_record
+    #     each_record.delete()
 

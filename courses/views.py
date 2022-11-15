@@ -177,6 +177,7 @@ class Searching(APIView):
         
         if search_result:
             queryset = queryset.filter(topic__icontains=search_result)
+        queryset = queryset.order_by('-weighted_rating')
             
         serializer = TopicSerializer(queryset, many=True)
         
