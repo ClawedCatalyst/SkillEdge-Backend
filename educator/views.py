@@ -13,7 +13,7 @@ from courses.serializers import *
 class BecomeEducator(APIView):
     permission_classes = [IsAuthenticated,]
     def put(self, request):
-        email = request.educator.email
+        email = request.user.email
         educator = NewUserRegistration.objects.get(email__iexact=email)
         
         if educator.is_verified == True:
@@ -28,7 +28,7 @@ class BecomeEducator(APIView):
             return Response({'msg':'educator is not verified'}, status=status.HTTP_400_BAD_REQUEST)    
 
     def get(self, request):
-        email = request.educator.email
+        email = request.user.email
         educator = NewUserRegistration.objects.get(email__iexact=email)
         courses = Course.objects.filter(educator_mail = educator.id)
         serializer = TopicSerializer(courses, many=True)
