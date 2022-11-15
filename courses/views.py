@@ -67,6 +67,8 @@ class Course_view(APIView):
             user.educator_rating = avg_weighted_rating
             user.save()
             if avg_weighted_rating > 2.5:
+                user.is_certified_educator = True
+                user.save()
                 request.POST._mutable = True
                 request.data["educator_mail"] = request.user.id
                 request.data["educator_name"] = user.name
@@ -75,7 +77,9 @@ class Course_view(APIView):
                 if serializer.is_valid(raise_exception=True):
                     serializer.save()
                     return Response(serializer.data) 
-            else:    
+            else:
+                user.is_certified_educator = False
+                user.save()    
                 request.POST._mutable = True
                 request.data["educator_mail"] = request.user.id
                 request.data["educator_name"] = user.name

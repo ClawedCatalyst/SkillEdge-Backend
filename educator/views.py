@@ -49,7 +49,11 @@ class BecomeEducator(APIView):
                 educator.educator_rating = avg_weighted_rating
                 educator.save()
                 if avg_weighted_rating  >= 2.5:
+                    educator.is_certified_educator = True
+                    educator.save()
                     return Response({'msg':'You are a certified educator'}, status=status.HTTP_400_BAD_REQUEST)
+                educator.is_certified_educator = False
+                educator.save()
                 return Response({'msg':'You are not a certified educator'}, status=status.HTTP_400_BAD_REQUEST)
             return Response({'msg':'user is not a educator'}, status=status.HTTP_400_BAD_REQUEST)                
         return Response({'msg':'user is not verified'}, status=status.HTTP_400_BAD_REQUEST)
