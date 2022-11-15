@@ -174,6 +174,15 @@ class Course_rating(APIView):
             #     return Response(rating)
             return Response({'msg':'enter valid details'})
 
+    def get(self,request,ck):
+        email = request.user.email
+        user = NewUserRegistration.objects.get(email__iexact=email)
+        feedback = feedbackmodel.objects.filter(course=ck,sender=request.user.id)
+        print(feedback)
+        feedback_serializer = GetRatingSerializer(instance = feedback, many=True)
+        return Response(feedback_serializer.data)
+
+
 class Searching(APIView):
     permission_classes = [IsAuthenticated,]
     def get(self,request):
