@@ -3,3 +3,4 @@ from . import models
 
 admin.site.register(models.interests)
 admin.site.register(models.NewUserRegistration)
+admin.site.register(models.OTP)

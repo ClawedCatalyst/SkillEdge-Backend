@@ -2,7 +2,9 @@ from django.core.mail import send_mail
 from django.core.mail import EmailMultiAlternatives
 import random
 from django.conf import settings
+from django.utils import timezone
 from base.models import *
+from django.utils import timezone
 
 def send_otp(email):
     subject = "Here's your account verification mail"
@@ -13,9 +15,8 @@ def send_otp(email):
     otp_msg = EmailMultiAlternatives(subject, text,email_by,[email])
     otp_msg.attach_alternative(style, "text/html")
     otp_msg.send()
-    user = NewUserRegistration.objects.get(email = email)
-    OTP.objects.filter(verifyEmail__iexact = user.email).delete()
-    OTP.objects.create(verifyEmail = user,time_created = timezone.now()) 
-    user.otp = otp
-    user.save()
+    OTP_user = OTP.objects.get(email=email)
+    OTP_user.otp = otp
+    OTP_user.time_created = timezone.now()
+    OTP_user.save()
 

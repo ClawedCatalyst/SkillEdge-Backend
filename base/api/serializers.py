@@ -1,5 +1,5 @@
 from dataclasses import field
-from base.models import NewUserRegistration
+from base.models import OTP, NewUserRegistration
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 
@@ -40,3 +40,9 @@ class passchangeserializer(serializers.Serializer):
     email = serializers.EmailField()
     otp = serializers.CharField()
     passwordd = serializers.CharField()
+    
+class Verify_OTP_serializer(ModelSerializer):
+    class Meta:
+        model = OTP
+        fields = ("name","user_name","email","password")
+    
