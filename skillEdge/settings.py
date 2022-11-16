@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'django_password_validators',
     'django_celery_beat',
     'django_celery_results',
+    'django.contrib.postgres'
 ]
 INTEREST = 'courses.Course'
 
@@ -166,6 +167,17 @@ DATABASES = {
        'PORT': '5432'
    }
 }
+
+# DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#        'NAME': 'skillEdgedb',
+#        'USER': 'postgres',
+#        'PASSWORD': 'derby@7348',
+#        'HOST': '127.0.0.1',
+#        'PORT': '5432'
+#    }
+# }
 
 
 

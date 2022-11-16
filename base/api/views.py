@@ -61,6 +61,8 @@ class New_user_registration(APIView):
             userOTP.delete()
         
         if serializer.is_valid(raise_exception=True):
+            serializer.validate
+            print(serializer.validate)
             try: 
                 validate_password(password)
             except:
@@ -71,7 +73,7 @@ class New_user_registration(APIView):
             OTP_send = OTP.objects.get(email=serializer.data["email"])
             OTP_send.password = make_password(password)
             OTP_send.save()
-            print(OTP_send.otp)
+
             send_otp(OTP_send.email)
             
             return Response({'msg':'Please check mail for OTP'}, status=status.HTTP_200_OK)
