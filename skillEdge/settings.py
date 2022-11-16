@@ -168,17 +168,6 @@ DATABASES = {
    }
 }
 
-# DATABASES = {
-#    'default': {
-#        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#        'NAME': 'skillEdgedb',
-#        'USER': 'postgres',
-#        'PASSWORD': 'derby@7348',
-#        'HOST': '127.0.0.1',
-#        'PORT': '5432'
-#    }
-# }
-
 
 
 # Password validation

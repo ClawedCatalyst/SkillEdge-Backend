@@ -41,29 +41,74 @@ class resetpassserializer(serializers.Serializer):
 class passchangeserializer(serializers.Serializer):
     email = serializers.EmailField()
     otp = serializers.CharField()
-    passwordd = serializers.CharField()
+    passwordd = serializers.CharField(required=True)
     
-class Verify_OTP_serializer(ModelSerializer):
-    class Meta:
-        model = OTP
-        fields = ("name","user_name","email","password")
-        extra_kwargs = {'password': {'write_only': True, 'min_length': 5, 'required': True, 'error_messages': {"required": "Password needed"}},}
-        
-        def validate(self, data):
+    def validate_password(self, data):
+            if len(data) < 8 :
+                raise ValidationError(
+                    ("The password needs to be more than 8 characters")
+                )
+            
             if not re.findall('\d', data):
                 raise ValidationError(
-                    _("The password must contain at least 1 digit, 0-9."),
+                    ("The password must contain at least 1 digit, 0-9."),
                     code='password_no_number',
                 )
             if not re.findall('[A-Z]', data):
                 raise ValidationError(
-                    _("The password must contain at least 1 uppercase letter, A-Z."),
+                    ("The password must contain at least 1 uppercase letter, A-Z."),
                     code='password_no_upper',
                 )
             if not re.findall('[a-z]', data):
                 raise ValidationError(
-                    _("The password must contain at least 1 lowercase letter, a-z."),
+                    ("The password must contain at least 1 lowercase letter, a-z."),
                     code='password_no_lower',
+                )
+            if not re.findall('[()[\]{}|\\`~!@#$%^&*_\-+=;:\'",<>./?]', data):
+                raise ValidationError(
+                    ("The password must contain at least 1 special character: " +
+                        "()[]{}|\`~!@#$%^&*_-+=;:'\",<>./?"),
+                    code='password_no_symbol',
+                )
+
+            return data
+    
+    
+class Verify_OTP_serializer(serializers.Serializer):
+        email = serializers.CharField(required=True)
+        name = serializers.CharField(required=True)
+        user_name = serializers.CharField(required=True)
+        password = serializers.CharField(required=True)
+        
+        def create(self,validated_data):
+            return OTP.objects.create(**validated_data)
+        
+        def validate_password(self, data):
+            if len(data) < 8 :
+                raise ValidationError(
+                    ("The password needs to be more than 8 characters")
+                )
+            
+            if not re.findall('\d', data):
+                raise ValidationError(
+                    ("The password must contain at least 1 digit, 0-9."),
+                    code='password_no_number',
+                )
+            if not re.findall('[A-Z]', data):
+                raise ValidationError(
+                    ("The password must contain at least 1 uppercase letter, A-Z."),
+                    code='password_no_upper',
+                )
+            if not re.findall('[a-z]', data):
+                raise ValidationError(
+                    ("The password must contain at least 1 lowercase letter, a-z."),
+                    code='password_no_lower',
+                )
+            if not re.findall('[()[\]{}|\\`~!@#$%^&*_\-+=;:\'",<>./?]', data):
+                raise ValidationError(
+                    ("The password must contain at least 1 special character: " +
+                        "()[]{}|\`~!@#$%^&*_-+=;:'\",<>./?"),
+                    code='password_no_symbol',
                 )
 
             return data

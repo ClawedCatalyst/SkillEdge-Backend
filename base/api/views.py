@@ -50,34 +50,26 @@ class List_of_registered_user(APIView):
         
 class New_user_registration(APIView): 
     def post(self, request,):
-        email = request.data.get("email")
-        password = request.data.get("password")
-        serializer = Verify_OTP_serializer(data=request.data)
-        
-        userOTP = OTP.objects.filter(email=email)
-        user = NewUserRegistration.objects.filter(email=email)
-        
-        if userOTP.exists() and not user.exists():
-            userOTP.delete()
-        
-        if serializer.is_valid(raise_exception=True):
-            serializer.validate
-            print(serializer.validate)
-            try: 
-                validate_password(password)
-            except:
-                return Response({"msg":"Password needs to be more than 8 characters, contains at least 1 uppercase, 1 lowercase, 1 number and 1 special character"},
-                                status=status.HTTP_400_BAD_REQUEST)   
+            email = request.data.get("email")
+            password = request.data.get("password")
+            serializer = Verify_OTP_serializer(data=request.data)
             
-            serializer.save()
-            OTP_send = OTP.objects.get(email=serializer.data["email"])
-            OTP_send.password = make_password(password)
-            OTP_send.save()
+            userOTP = OTP.objects.filter(email=email)
+            user = NewUserRegistration.objects.filter(email=email)
+            
+            if userOTP.exists() and not user.exists():
+                userOTP.delete()
+            
+            if serializer.is_valid(raise_exception=True):            
+                serializer.save()
+                OTP_send = OTP.objects.get(email=serializer.data["email"])
+                OTP_send.password = make_password(password)
+                OTP_send.save()
 
-            send_otp(OTP_send.email)
-            
-            return Response({'msg':'Please check mail for OTP'}, status=status.HTTP_200_OK)
-            
+                send_otp(OTP_send.email)
+                
+                return Response({'msg':'Please check mail for OTP'}, status=status.HTTP_200_OK)
+                
         
         
     
