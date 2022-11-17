@@ -179,6 +179,8 @@ class Course_rating(APIView):
         email = request.user.email
         user = NewUserRegistration.objects.get(email__iexact=email)
         feedback = feedbackmodel.objects.filter(course=ck,sender=request.user.id)
+        if len(feedback)==0:
+            return Response({"msg":"Not rated"}, status=status.HTTP_400_BAD_REQUEST)  
         print(feedback)
         feedback_serializer = GetRatingSerializer(instance = feedback, many=True)
         return Response(feedback_serializer.data)
