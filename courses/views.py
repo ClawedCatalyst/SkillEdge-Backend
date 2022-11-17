@@ -12,11 +12,8 @@ from .filters import CourseFilter
 from moviepy.editor import VideoFileClip
 import math  
 from .rating import calculate_weighted_rating
-# from pymediainfo import MediaInfo
-# import cv2
-# import datetime
-# import subprocess
-# import json
+from django.contrib.postgres.search import TrigramWordSimilarity, TrigramSimilarity,SearchVector
+from django.db.models.functions import Greatest
 
 
 class Category_view(APIView):
@@ -159,7 +156,8 @@ class Course_rating(APIView):
                 else:
                     present_rating = rating*count
                     new_rating = (present_rating + review)/(count + 1)
-                    count+=1
+                    if check_status == 0:
+                        count+=1
                     course.review_count = count
                     rating_serializer = RatingSerializer(instance = course,data=request.data)
                     if rating_serializer.is_valid(raise_exception=True):
@@ -181,23 +179,23 @@ class Course_rating(APIView):
         email = request.user.email
         user = NewUserRegistration.objects.get(email__iexact=email)
         feedback = feedbackmodel.objects.filter(course=ck,sender=request.user.id)
+        if len(feedback)==0:
+            return Response({"msg":"Not rated"}, status=status.HTTP_400_BAD_REQUEST)  
         print(feedback)
         feedback_serializer = GetRatingSerializer(instance = feedback, many=True)
         return Response(feedback_serializer.data)
 
 
 class Searching(APIView):
-    permission_classes = [IsAuthenticated,]
     def get(self,request):
         queryset = Course.objects.all()
         my_filter = CourseFilter(request.GET, queryset=queryset)
         queryset = my_filter.qs
         
         search_result = request.GET.get('search-area') or ''
-        
         if search_result:
-            queryset = queryset.filter(topic__icontains=search_result)
-        queryset = queryset.order_by('-weighted_rating')
+            queryset = queryset.annotate(similarity=Greatest( TrigramWordSimilarity(search_result, 'topic'), TrigramWordSimilarity(search_result, 'educator_name'))).filter(similarity__gt=0.30).order_by('-similarity')
+              
             
         serializer = TopicSerializer(queryset, many=True)
         

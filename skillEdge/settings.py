@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'django_password_validators',
     'django_celery_beat',
     'django_celery_results',
+    'django.contrib.postgres'
 ]
 INTEREST = 'courses.Course'
 

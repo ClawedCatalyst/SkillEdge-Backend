@@ -52,7 +52,8 @@ class BuyCourseView(APIView):
             student.purchasedCourse.add(course.id)
             student.save()
             send_course_confirmation(request.user.email)
-            return Response(serializer_student.data)
+            print(serializer_student.data)
+            return Response({'msg':'Your IN! Order Confirmation'}, status=status.HTTP_200_OK)
         return Response({'msg':'transaction failed'}, status=status.HTTP_400_BAD_REQUEST)
 
 class BuyAllCourseView(APIView):
@@ -100,7 +101,8 @@ class BuyAllCourseView(APIView):
         if serializer_student.is_valid():
             serializer_student.save()
             send_course_confirmation(request.user.email)
-            return Response(serializer_student.data)
+            print(serializer_student)
+            return Response({'msg':'Your IN! Order Confirmation'}, status=status.HTTP_200_OK)
         return Response({'msg':'transaction failed'}, status=status.HTTP_400_BAD_REQUEST)
 
     def get(self,request):
