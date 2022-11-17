@@ -159,7 +159,8 @@ class Course_rating(APIView):
                 else:
                     present_rating = rating*count
                     new_rating = (present_rating + review)/(count + 1)
-                    count+=1
+                    if check_status == 0:
+                        count+=1
                     course.review_count = count
                     rating_serializer = RatingSerializer(instance = course,data=request.data)
                     if rating_serializer.is_valid(raise_exception=True):

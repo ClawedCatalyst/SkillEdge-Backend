@@ -15,14 +15,13 @@ def calculate_weighted_rating(course):
     # print(cummulative_rating)
     for hosted_course in all_courses:
         votes = hosted_course.review_count
-        print(votes)
+        # print(votes)
         avg_rating = hosted_course.rating
-        print(avg_rating)
+        # print(avg_rating)
         live_weighted_rating = ((avg_rating*votes)+(cummulative_rating*default_votes))/(votes + default_votes)
-        print(live_weighted_rating)
+        # print(live_weighted_rating)
         hosted_course.weighted_rating = live_weighted_rating
-        print(hosted_course.weighted_rating)
+        # print(hosted_course.weighted_rating)
         hosted_course.save()
-        print("\n")
     specific_weighted_rating = ((specific_avg_rating*specific_votes)+(cummulative_rating*default_votes))/(specific_votes + default_votes)
     return specific_weighted_rating 
