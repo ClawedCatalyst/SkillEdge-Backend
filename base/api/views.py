@@ -132,6 +132,7 @@ class OTP_check(APIView):
             userOTP.save()
             if user is not None:
                 token = getTokens(user)
+                cart.objects.create(email=user.email , user = user)               
                 return Response({'token': token,'msg':'verification Successfull'},status=status.HTTP_200_OK)
             
             return Response({'msg':'user does not exists'}, status=status.HTTP_400_BAD_REQUEST)
