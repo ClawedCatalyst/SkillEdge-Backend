@@ -14,11 +14,6 @@ import math
 from .rating import calculate_weighted_rating
 from django.contrib.postgres.search import TrigramWordSimilarity, TrigramSimilarity,SearchVector
 from django.db.models.functions import Greatest
-# from pymediainfo import MediaInfo
-# import cv2
-# import datetime
-# import subprocess
-# import json
 
 
 class Category_view(APIView):
@@ -190,21 +185,12 @@ class Course_rating(APIView):
 
 
 class Searching(APIView):
-    permission_classes = [IsAuthenticated,]
     def get(self,request):
         queryset = Course.objects.all()
         my_filter = CourseFilter(request.GET, queryset=queryset)
         queryset = my_filter.qs
         
         search_result = request.GET.get('search-area') or ''
-        # search_result = request.data.get('search_result')
-        
-        # if search_result:
-        #     queryset = queryset.filter(topic__icontains=search_result)
-        # queryset = queryset.order_by('-weighted_rating')
-        
-        # vector =  SearchVector('topic','educator_name')
-        
         if search_result:
             queryset = queryset.annotate(similarity=Greatest( TrigramWordSimilarity(search_result, 'topic'), TrigramWordSimilarity(search_result, 'educator_name'))).filter(similarity__gt=0.30).order_by('-similarity')
               

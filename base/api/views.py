@@ -130,8 +130,11 @@ class OTP_check(APIView):
             userOTP.is_verified = True
             user.save()
             userOTP.save()
-            context = {'msg':'verification Successfull'}
-            return Response(context, status=status.HTTP_200_OK)
+            if user is not None:
+                token = getTokens(user)
+                return Response({'token': token,'msg':'verification Successfull'},status=status.HTTP_200_OK)
+            
+            return Response({'msg':'user does not exists'}, status=status.HTTP_400_BAD_REQUEST)
 
 class Resend_otp(APIView):
     def post(self, request, format=None):
