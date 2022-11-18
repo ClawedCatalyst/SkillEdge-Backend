@@ -55,10 +55,10 @@ class New_user_registration(APIView):
             user_name = request.data.get("user_name")
             user = NewUserRegistration.objects.filter(email=email)
             if user.exists():
-                return Response({'message':'Email already exists'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'msg':'Email'}, status=status.HTTP_400_BAD_REQUEST)
             username = NewUserRegistration.objects.filter(user_name=user_name)
             if username.exists():
-                return Response({'message':'Username already exists'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'msg':'Username'}, status=status.HTTP_400_BAD_REQUEST)
             serializer = Verify_OTP_serializer(data=request.data)
             
             userOTP = OTP.objects.filter(email=email)
