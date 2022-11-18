@@ -78,7 +78,7 @@ class New_user_registration(APIView):
 
                 send_otp(OTP_send.email)
                 
-                return Response({'msg':'Please check mail for OTP'}, status=status.HTTP_200_OK)
+                return Response({'msg':'success'}, status=status.HTTP_200_OK)
                 
         
         
