@@ -49,16 +49,26 @@ class List_of_registered_user(APIView):
         return Response(serializer.data)
         
 class New_user_registration(APIView): 
-    def post(self, request,):
+    def post(self, request):
             email = request.data.get("email")
             password = request.data.get("password")
+            user_name = request.data.get("user_name")
+            user = NewUserRegistration.objects.filter(email=email)
+            if user.exists():
+                return Response({'msg':'Email'}, status=status.HTTP_400_BAD_REQUEST)
+            username = NewUserRegistration.objects.filter(user_name=user_name)
+            if username.exists():
+                return Response({'msg':'Username'}, status=status.HTTP_400_BAD_REQUEST)
             serializer = Verify_OTP_serializer(data=request.data)
             
             userOTP = OTP.objects.filter(email=email)
-            user = NewUserRegistration.objects.filter(email=email)
             
-            if userOTP.exists() and not user.exists():
-                userOTP.delete()
+            if userOTP.exists():
+                if not user.exists():
+                    userOTP.delete()
+            
+            print(userOTP)
+            print(user)
             
             if serializer.is_valid(raise_exception=True):            
                 serializer.save()
@@ -68,7 +78,7 @@ class New_user_registration(APIView):
 
                 send_otp(OTP_send.email)
                 
-                return Response({'msg':'Please check mail for OTP'}, status=status.HTTP_200_OK)
+                return Response({'msg':'success'}, status=status.HTTP_200_OK)
                 
         
         
@@ -132,6 +142,7 @@ class OTP_check(APIView):
             userOTP.save()
             if user is not None:
                 token = getTokens(user)
+                cart.objects.create(email=user.email , user = user)               
                 return Response({'token': token,'msg':'verification Successfull'},status=status.HTTP_200_OK)
             
             return Response({'msg':'user does not exists'}, status=status.HTTP_400_BAD_REQUEST)
