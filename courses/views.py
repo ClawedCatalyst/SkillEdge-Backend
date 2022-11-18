@@ -196,7 +196,7 @@ class Searching(APIView):
         if search_result:
             queryset = queryset.annotate(similarity=Greatest( TrigramWordSimilarity(search_result, 'topic'), TrigramWordSimilarity(search_result, 'educator_name'))).filter(similarity__gt=0.30).order_by('-similarity')
               
-            
+      
         serializer = TopicSerializer(queryset, many=True)
         
         if serializer.data == []:

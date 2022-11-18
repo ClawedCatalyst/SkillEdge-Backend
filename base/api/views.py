@@ -57,8 +57,15 @@ class New_user_registration(APIView):
             userOTP = OTP.objects.filter(email=email)
             user = NewUserRegistration.objects.filter(email=email)
             
-            if userOTP.exists() and not user.exists():
-                userOTP.delete()
+            if user.exists():
+                return Response({'msg':'User already exists, Please LogIN'},status=status.HTTP_400_BAD_REQUEST)
+            
+            if userOTP.exists():
+                if not user.exists():
+                    userOTP.delete()
+            
+            print(userOTP)
+            print(user)
             
             if serializer.is_valid(raise_exception=True):            
                 serializer.save()
