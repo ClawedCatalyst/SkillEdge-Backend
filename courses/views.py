@@ -6,12 +6,13 @@ from .serializers import *
 from .models import *
 from base.models import *
 from base.api.serializers import *
-from .pagination import PaginationHandlerMixin
+# from .pagination import PaginationHandlerMixin
 from rest_framework.pagination import PageNumberPagination
 from .filters import CourseFilter
 from moviepy.editor import VideoFileClip
 import math  
 from .rating import calculate_weighted_rating
+from django.core.paginator import Paginator
 from django.contrib.postgres.search import TrigramWordSimilarity, TrigramSimilarity,SearchVector
 from django.db.models.functions import Greatest
 
@@ -92,13 +93,9 @@ class Course_view(APIView):
         else:
             return Response({'msg':'user is not an educator'})   
 
- 
-class Basic_pagination(PageNumberPagination):
-    page_size_query_param = 'limit'            
-
-class View_filtered_courses(APIView, PaginationHandlerMixin):
+            
+class View_filtered_courses(APIView):
     permission_classes = [IsAuthenticated,]
-    pagination_class = Basic_pagination
     serializer_class = TopicSerializer
     def get(self,request):
         email = request.user.email
@@ -107,13 +104,15 @@ class View_filtered_courses(APIView, PaginationHandlerMixin):
         courses = Course.objects.filter(category__in=user_interested_courses)
         
         courses = Course.objects.order_by('-weighted_rating')
-        page = self.paginate_queryset(courses)
+        paginator = PageNumberPagination()
+        page = paginator.paginate_queryset(courses, request=request)
         if page is not None:
-            serializer = self.get_paginated_response(self.serializer_class(page,many=True).data)
+            serializer = paginator.get_paginated_response(self.serializer_class(page,many=True).data)
         else:
             serializer = self.serializer_class(courses, many=True)
         
         return Response(serializer.data)
+    
 
 class Course_rating(APIView):
     permission_classes = [IsAuthenticated,]
