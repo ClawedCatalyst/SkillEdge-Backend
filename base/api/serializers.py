@@ -1,4 +1,6 @@
+from ast import Mod
 from dataclasses import field
+from pyexpat import model
 from base.models import OTP, NewUserRegistration
 from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
@@ -29,6 +31,11 @@ class profileSerializer(ModelSerializer):
         fields = ("name", "user_name" ,"picture", "gender","dateOfBirth","mobile","is_educator","email","is_certified_educator","educator_rating")
         
         extra_kwargs = {'email': {'required': False ,"allow_null": True},}
+ 
+class addInterestSerializer(ModelSerializer):
+    class Meta:
+        model = NewUserRegistration
+        fields = ['interested']      
     
 
 class otpcheckserializer(serializers.Serializer):
@@ -43,7 +50,7 @@ class passchangeserializer(serializers.Serializer):
     otp = serializers.CharField()
     passwordd = serializers.CharField(required=True)
     
-    def validate_password(self, data):
+    def validate_passwordd(self, data):
             if len(data) < 8 :
                 raise ValidationError(
                     ("The password needs to be more than 8 characters")

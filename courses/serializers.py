@@ -34,18 +34,6 @@ class GetRatingSerializer(ModelSerializer):
 
         extra_kwargs = {'course': {'required': True},'latest_review': {'required': False}}
 
-class catSerializer(serializers.Serializer):
-    Interest1 = serializers.BooleanField()
-    Interest2 = serializers.BooleanField()
-    Interest3 = serializers.BooleanField()
-    Interest4 = serializers.BooleanField()
-    Interest5 = serializers.BooleanField()
-    Interest6 = serializers.BooleanField()
-    Interest7 = serializers.BooleanField()
-    Interest8 = serializers.BooleanField()
-    Interest9 = serializers.BooleanField()
-    Interest10 = serializers.BooleanField()
-    Interest11 = serializers.BooleanField()
     
 class lessonSerializer(ModelSerializer):
     class Meta:

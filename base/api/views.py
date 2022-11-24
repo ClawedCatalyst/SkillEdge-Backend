@@ -7,6 +7,8 @@ from django.contrib.auth import authenticate
 from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth.password_validation import validate_password
 from django.utils import timezone
+from rest_framework import generics
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .serializers import *
 from .mail import *
 from base.models import *
@@ -106,6 +108,8 @@ class Profile_details(APIView):
             user = NewUserRegistration.objects.get(email = email)
             user.delete()
             return Response({'message': 'Deleted'}, status=status.HTTP_200_OK)
+
+            
     
     
 class OTP_check(APIView):

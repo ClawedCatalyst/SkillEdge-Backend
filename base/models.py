@@ -72,8 +72,7 @@ class NewUserRegistration(AbstractBaseUser):
     picture = models.ImageField(upload_to="images", default="images/defaultProfilePicture_jkvski.png")
     dateOfBirth = models.DateField(blank=False,default="2022-10-10")
     wallet = models.FloatField(validators=[MinValueValidator(0)],default=0,null=True,blank=False)
-    # otp = models.CharField(max_length=4, blank=True, null=True)
-    interested = models.ManyToManyField(interests)
+    interested = models.ManyToManyField(interests, blank=True)
     purchasedCourse = models.ManyToManyField(settings.INTEREST)
     educator_rating = models.FloatField(default=0)
 
