@@ -8,12 +8,16 @@ from base.models import *
 from base.api.serializers import *
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 # from .pagination import PaginationHandlerMixin
 >>>>>>> ece2bb06a4287d5090f9cefc8bbb23050f0f89a7
 =======
 # from .pagination import PaginationHandlerMixin
 >>>>>>> ece2bb06a4287d5090f9cefc8bbb23050f0f89a7
+=======
+# from .pagination import PaginationHandlerMixin
+>>>>>>> main
 from rest_framework.pagination import PageNumberPagination
 from .filters import CourseFilter
 import math  
