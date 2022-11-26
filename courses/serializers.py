@@ -3,6 +3,7 @@ from rest_framework.serializers import ModelSerializer
 from rest_framework import serializers
 from .models import *
 from base.models import *
+from django.core.exceptions import ValidationError
 
 class TopicSerializer(ModelSerializer):
     class Meta:
@@ -40,8 +41,21 @@ class lessonSerializer(ModelSerializer):
         model = lessons
         fields = ['id','topic','lessonName','file','length']    
         
-class AddLessonSerializer(ModelSerializer):
+
+        
+class AddLessonSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = lessons
-        fields = ['id','topic','lessonName','file']        
+        fields = ['id','topic','lessonName','file']
+        validators = []         
+        
+    def validate(self,data):
+        course = Course.objects.get(id=data['topic'])
+        user =  self.context['request'].user
+        
+        if str(course.educator_mail) != str(user.email):
+            raise ValidationError(
+                    ({'msg':'invalid'})
+                )
+            

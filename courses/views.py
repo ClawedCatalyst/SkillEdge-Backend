@@ -1,3 +1,5 @@
+from email import message_from_binary_file
+from unicodedata import category
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -6,23 +8,11 @@ from .serializers import *
 from .models import *
 from base.models import *
 from base.api.serializers import *
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-# from .pagination import PaginationHandlerMixin
->>>>>>> ece2bb06a4287d5090f9cefc8bbb23050f0f89a7
-=======
-# from .pagination import PaginationHandlerMixin
->>>>>>> ece2bb06a4287d5090f9cefc8bbb23050f0f89a7
-=======
-# from .pagination import PaginationHandlerMixin
->>>>>>> main
 from rest_framework.pagination import PageNumberPagination
 from .filters import CourseFilter
 import math  
 from .rating import calculate_weighted_rating
-from django.core.paginator import Paginator
+from rest_framework import generics
 from django.contrib.postgres.search import TrigramWordSimilarity, TrigramSimilarity,SearchVector
 from django.db.models.functions import Greatest
 
@@ -92,26 +82,6 @@ class Course_view(APIView):
         else:
             return Response({'msg':'user is not an educator'})   
 
-            
-class View_filtered_courses(APIView):
-    permission_classes = [IsAuthenticated,]
-    serializer_class = TopicSerializer
-    def get(self,request):
-        email = request.user.email
-        user = NewUserRegistration.objects.get(email__iexact=email)
-        user_interested_courses = user.interested.all()
-        courses = Course.objects.filter(category__in=user_interested_courses)
-        
-        courses = Course.objects.order_by('-weighted_rating')
-        paginator = PageNumberPagination()
-        page = paginator.paginate_queryset(courses, request=request)
-        if page is not None:
-            serializer = paginator.get_paginated_response(self.serializer_class(page,many=True).data)
-        else:
-            serializer = self.serializer_class(courses, many=True)
-        
-        return Response(serializer.data)
-    
 
 class Course_rating(APIView):
     permission_classes = [IsAuthenticated,]
@@ -183,25 +153,6 @@ class Course_rating(APIView):
         feedback_serializer = GetRatingSerializer(instance = feedback, many=True)
         return Response(feedback_serializer.data)
 
-
-class Searching(APIView):
-    def get(self,request):
-        queryset = Course.objects.all()
-        my_filter = CourseFilter(request.GET, queryset=queryset)
-        queryset = my_filter.qs
-        
-        search_result = request.GET.get('search-area') or ''
-        if search_result:
-            queryset = queryset.annotate(similarity=Greatest( TrigramWordSimilarity(search_result, 'topic'), TrigramWordSimilarity(search_result, 'educator_name'))).filter(similarity__gt=0.30).order_by('-similarity')
-              
-      
-        serializer = TopicSerializer(queryset, many=True)
-        
-        if serializer.data == []:
-            return Response({'msg':'Nothing Found'}, status=status.HTTP_400_BAD_REQUEST)
-        
-        return Response(serializer.data)  
-    
 class Purchased_courses(APIView):
     permission_classes = [IsAuthenticated,]
     def get(self,request):
@@ -213,73 +164,104 @@ class Purchased_courses(APIView):
         return Response(topic_serializer.data)
     
 
-class Lesson_view(APIView):
-    permission_classes = [IsAuthenticated,]
+# class Lesson_view(APIView):
+#     permission_classes = [IsAuthenticated,]
     
-    def get(self,request):
-        lesson = lessons.objects.all()
-        serializer = lessonSerializer(lesson, many=True)
+#     def get(self,request):
+#         lesson = lessons.objects.all()
+#         serializer = lessonSerializer(lesson, many=True)
         
-        return Response(serializer.data)
+#         return Response(serializer.data)
     
     
     
-    def post(self,request):
-        email = request.user.email
-        user = NewUserRegistration.objects.get(email__iexact=email)
-        topic = request.data.get("topic")
-        course = Course.objects.get(id=topic)
+#     def post(self,request):
+#         email = request.user.email
+#         user = NewUserRegistration.objects.get(email__iexact=email)
+#         topic = request.data.get("topic")
+#         course = Course.objects.get(id=topic)
         
-        if str(course.educator_mail) != str(email):
-            return Response({'msg':'invalid'})
+#         if str(course.educator_mail) != str(email):
+#             return Response({'msg':'invalid'})
         
-        try:
-            print(course.educator_mail)
-            print(email)
-            if user.is_educator == True:
-                    request.POST._mutable = True
-                    request.data["topic"] = topic
-                    request.POST._mutable = False
-                    serializer = lessonSerializer(data=request.data)
-                    if serializer.is_valid(raise_exception=True):
-                        serializer.save()
-                        # media_info = MediaInfo.parse(serializer.data['file'])
-                        # length = media_info.tracks[0].duration
-                        
-                        # video = VideoFileClip(str(serializer.data['file']))
-                        # print(serializer.data['file'])
-                        # length = video.duration
-                        # print(length)
-                        # seconds = math.floor(length%60)
-                        # seconds = seconds/100
-                        # minutes = math.floor(length//60)   
-                        
-                        
-                        # print(minutes+seconds)
-                    # lesson_id = lessons.objects.get(id=serializer.data['id'])
-                    # lesson_id.length = str(duration_seconds)
-                    # lesson_id.save()
-                    
-                    return Response({'msg':'lesson added'})    
-            return Response({'msg':'user is not an educator'})
-        except:
-            return Response({'msg':'invalid'}, status=status.HTTP_400_BAD_REQUEST)     
-        
+#         try:
+#             print(course.educator_mail)
+#             print(email)
+#             if user.is_educator == True:
+#                     request.POST._mutable = True
+#                     request.data["topic"] = topic
+#                     request.POST._mutable = False
+#                     serializer = lessonSerializer(data=request.data)
+#                     if serializer.is_valid(raise_exception=True):
+#                         serializer.save()
+#                     return Response({'msg':'lesson added'})    
+#             return Response({'msg':'user is not an educator'})
+#         except:
+#             return Response({'msg':'invalid'}, status=status.HTTP_400_BAD_REQUEST)     
     
-class View_specific_course_lesson(APIView):
-    def post(self,request):
-        try:
-            topic = request.data.get("topic")
-            lesson = lessons.objects.filter(topic=topic)
-            serializer = lessonSerializer(lesson, many=True)
-            if serializer.data == []:
-                return Response({"msg":"No such course exists"},status=status.HTTP_400_BAD_REQUEST)
-            return Response(serializer.data)
-        except:
-            return Response({"msg":"Enter a valid course"}, status=status.HTTP_400_BAD_REQUEST)  
+    
+# class View_specific_course_lesson(APIView):
+#     def post(self,request):
+#         try:
+#             topic = request.data.get("topic")
+#             lesson = lessons.objects.filter(topic=topic)
+#             serializer = lessonSerializer(lesson, many=True)
+#             if serializer.data == []:
+#                 return Response({"msg":"No such course exists"},status=status.HTTP_400_BAD_REQUEST)
+#             return Response(serializer.data)
+#         except:
+#             return Response({"msg":"Enter a valid course"}, status=status.HTTP_400_BAD_REQUEST)  
+
+        
+                   
             
 class Course_feedback(APIView):
     def get(self,request,ck):
         course = feedbackmodel.objects.filter(course = ck)
         rating_serializer = GetRatingSerializer(instance = course , many = True)
         return Response(rating_serializer.data)
+    
+
+
+#View Filtered Courses Based On Interest API
+    
+class View_filtered_courses(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = TopicSerializer
+    paginate_by = 10
+    def get_queryset(self):
+        return Course.objects.filter(category__in=self.request.user.interested.all()).order_by('-weighted_rating')
+
+
+#Searching API 
+    
+class Searching(generics.ListAPIView):
+    serializer_class = TopicSerializer
+    def get_queryset(self):
+        queryset = Course.objects.all()
+        my_filter = self.request.GET.get('my_filter')
+        if my_filter is not None:
+            queryset = queryset.filter(category=my_filter)
+        
+        search_result = self.request.GET.get('search-area') or ''
+        return queryset.annotate(similarity=Greatest( TrigramWordSimilarity(search_result, 'topic'), TrigramWordSimilarity(search_result, 'educator_name'))).filter(similarity__gt=0.30).order_by('-similarity')  
+
+
+# Create Lesson API
+    
+class Lesson_view(generics.CreateAPIView):
+        serializer_class =  lessonSerializer
+        permission_classes = [IsAuthenticated]    
+        
+        def post(self, request):
+            return self.create(request)     
+           
+#Lesson View Of a Particular Course API
+
+class View_specific_course_lesson(generics.ListAPIView):
+    serializer_class = lessonSerializer
+    lesson = lessons.objects.all()
+    def get_queryset(self):
+        topic = self.request.data.get("topic")
+        return self.lesson.filter(topic=topic)
+                
