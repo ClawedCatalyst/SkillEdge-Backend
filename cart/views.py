@@ -8,6 +8,7 @@ from .serializers import *
 from courses.serializers import *
 from .models import *
 from base.models import *
+from rest_framework import generics
 
 # Create your views here.
 class Create_cart(APIView):
@@ -69,25 +70,25 @@ class Cart(APIView):
             return Response({'msg':'Invalid method'}, status=status.HTTP_400_BAD_REQUEST)
 
     def get(self,request):
-        email = request.user.email
-        user = NewUserRegistration.objects.get(email__iexact=email)
-        cart_id = cart.objects.get(email__iexact =email)
-        # print(ct.id)
-        courses = cart_courses.objects.filter(cart=cart_id.id)
-        # print(courses)
-        if len(courses) == 0:
-            return Response({'msg':'no courses in cart'}, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            courselist= []
-            for course in courses:
-                cid = course.course.id
-                crs = Course.objects.get(id=cid)
-                serializer = TopicSerializer(instance = crs)
-                # print(serializer.data)
-                courselist.append(serializer.data)
+            email = request.user.email
+            user = NewUserRegistration.objects.get(email__iexact=email)
+            cart_id = cart.objects.get(email__iexact =email)
+            # print(ct.id)
+            courses = cart_courses.objects.filter(cart=cart_id.id)
+            # print(courses)
+            if len(courses) == 0:
+                return Response({'msg':'no courses in cart'}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                courselist= []
+                for course in courses:
+                    cid = course.course.id
+                    crs = Course.objects.get(id=cid)
+                    serializer = TopicSerializer(instance = crs)
+                    # print(serializer.data)
+                    courselist.append(serializer.data)
 
-        # serializer = TopicSerializer(instance = courselist, many = True)
-        return Response(courselist)
+            # serializer = TopicSerializer(instance = courselist, many = True)
+            return Response(courselist)
 
     def delete(self,request,ck):
         email = request.user.email
@@ -99,3 +100,17 @@ class Cart(APIView):
             return Response({'msg':'course does not exist in cart'}, status=status.HTTP_400_BAD_REQUEST)
         cart_courseid.delete()
         return Response({'msg':'course removed successfully from cart'})
+
+class CartTrial(generics.ListAPIView):
+    permission_classes = [IsAuthenticated,]
+    serializer_class = TopicSerializer
+    def get_queryset(self):
+        email = self.request.user.email
+        cart_id = cart.objects.get(email__iexact =email)
+        courses = cart_courses.objects.filter(cart=cart_id.id)
+        if len(courses) == 0:
+            return Response({'msg':'no courses in cart'}, status=status.HTTP_400_BAD_REQUEST)
+        course_id=[]
+        for course in courses:
+            course_id.append(course.course.id)
+        return Course.objects.filter(id__in=course_id)
