@@ -5,6 +5,7 @@
 # import environ
 # import razorpay
 
+import email
 from .models import Order
 from rest_framework import status
 from base.models import *
@@ -14,6 +15,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from .serializers import *
 from base.models import *
+from rest_framework import generics
 
 # env = environ.Env()
 # environ.Env.read_env()
@@ -140,34 +142,44 @@ from base.models import *
 
 #         return Response(res_data)
 
-class Flutter_Razorpay(APIView):
-    permission_classes = [IsAuthenticated,]
+# class Flutter_Razorpay(APIView):
+#     permission_classes = [IsAuthenticated,]
     
-    def get(self, request):
-        email = request.user.email
-        user = NewUserRegistration.objects.get(email=email)
-        transaction_history = Order.objects.filter(user_mail=user.id)
-        serializer = OrderSerializer(transaction_history, many=True)
-        return Response(serializer.data)
+#     def get(self, request):
+#         email = request.user.email
+#         user = NewUserRegistration.objects.get(email=email)
+#         transaction_history = Order.objects.filter(user_mail=user.id)
+#         serializer = OrderSerializer(transaction_history, many=True)
+#         return Response(serializer.data)
     
-    def post(self, request):
-        try:
-            email = request.user.email
-            user = NewUserRegistration.objects.get(email=email)
-            request.POST._mutable = True
-            request.data["user_mail"] = request.user.id
-            request.POST._mutable = False
-            serializer = OrderSerializer(data=request.data)
-            if serializer.is_valid(raise_exception=True):
-                serializer.save()
-                print(user.wallet)
-                user.wallet += int(serializer.data['order_amount'])
-                if user.wallet < 0:
-                    return Response({'msg':'Not enough Balance'}, status=status.HTTP_400_BAD_REQUEST)
+#     def post(self, request):
+#         try:
+#             email = request.user.email
+#             user = NewUserRegistration.objects.get(email=email)
+#             request.POST._mutable = True
+#             request.data["user_mail"] = request.user.id
+#             request.POST._mutable = False
+#             serializer = OrderSerializer(data=request.data)
+#             if serializer.is_valid(raise_exception=True):
+#                 serializer.save()
+#                 print(user.wallet)
+#                 user.wallet += int(serializer.data['order_amount'])
+#                 if user.wallet < 0:
+#                     return Response({'msg':'Not enough Balance'}, status=status.HTTP_400_BAD_REQUEST)
                 
-                user.save()
-                print(user.wallet)
-                return Response(serializer.data)
-        except:
-            return Response({"msg":"Payment Failed"}, status=status.HTTP_400_BAD_REQUEST)    
-        
+#                 user.save()
+#                 print(user.wallet)
+#                 return Response(serializer.data)
+#         except:
+#             return Response({"msg":"Payment Failed"}, status=status.HTTP_400_BAD_REQUEST)    
+
+class Flutter_Razorpay(generics.ListAPIView,generics.CreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = OrderSerializer
+
+    def get_queryset(self):
+        return Order.objects.filter(user_mail=self.request.user.id)
+    
+    def post(self,request):
+        request.data["user_mail"] = request.user.id
+        return self.create(request)

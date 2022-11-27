@@ -41,21 +41,15 @@ class lessonSerializer(ModelSerializer):
         model = lessons
         fields = ['id','topic','lessonName','file','length']    
         
-
-        
-class AddLessonSerializer(serializers.ModelSerializer):
-    
-    class Meta:
-        model = lessons
-        fields = ['id','topic','lessonName','file']
-        validators = []         
-        
     def validate(self,data):
-        course = Course.objects.get(id=data['topic'])
+        course = Course.objects.get(topic=data['topic'])
         user =  self.context['request'].user
         
         if str(course.educator_mail) != str(user.email):
             raise ValidationError(
                     ({'msg':'invalid'})
                 )
+        return data
+       
+        
             
