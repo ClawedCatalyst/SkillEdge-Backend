@@ -107,10 +107,7 @@ class CartTrial(generics.ListAPIView):
     def get_queryset(self):
         email = self.request.user.email
         cart_id = cart.objects.get(email__iexact =email)
-        courses = cart_courses.objects.filter(cart=cart_id.id)
+        courses = cart_courses.objects.filter(cart=cart_id.id).values_list('course')
         if len(courses) == 0:
             return Response({'msg':'no courses in cart'}, status=status.HTTP_400_BAD_REQUEST)
-        course_id=[]
-        for course in courses:
-            course_id.append(course.course.id)
-        return Course.objects.filter(id__in=course_id)
+        return Course.objects.filter(id__in=courses)
