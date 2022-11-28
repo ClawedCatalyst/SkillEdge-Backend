@@ -100,8 +100,7 @@ class Get_cart(generics.ListAPIView):
     permission_classes = [IsAuthenticated,]
     serializer_class = TopicSerializer
     def get_queryset(self):
-        email = self.request.user.email
-        cart_id = cart.objects.get(email__iexact =email)
+        cart_id = cart.objects.get(email__iexact = self.request.user.email)
         courses = cart_courses.objects.filter(cart=cart_id.id).values_list('course')
         if len(courses) == 0:
             return Response({'msg':'no courses in cart'}, status=status.HTTP_400_BAD_REQUEST)
@@ -112,27 +111,23 @@ class Post_cart(generics.CreateAPIView):
     serializer_class = AddCartSerializer
     def post(self,request):
         email = request.user.email
-        course_details = Course.objects.get(id = request.data['course'])
-        if request.user.id == course_details.educator_mail.id:
-            return Response({'msg':'You can not buy your self hosted course '}, status=status.HTTP_400_BAD_REQUEST)
-        course = request.user.purchasedCourse.filter(id=request.data['course'])
-        if course.exists():
-            return Response({'msg':'course already purchased'}, status=status.HTTP_400_BAD_REQUEST)   
-        request.POST._mutable = True
-        request.data["cart"] = cart.objects.get(email__iexact =email).id
-        request.POST._mutable = False
+        request.data.update({"cart" : cart.objects.get(email__iexact =email).id})
         cart_course = cart_courses.objects.filter(cart=request.data["cart"],course=request.data["course"])
-        print(request.data)
         if len(cart_course) == 0:
-            self.create(request)
+            super().create(request)
             return Response({'msg':'course added successfully to cart'})
         return Response({'msg':'course already added to cart'}, status=status.HTTP_400_BAD_REQUEST)
 
-class Delete_in_cart(generics.DestroyAPIView):
+class Delete_in_cart(generics.RetrieveDestroyAPIView):
     permission_classes = [IsAuthenticated,]
     serializer_class = AddCartSerializer
-    def destroy(self,ck,*args,**kwargs):
-        instance = self.get_object(cart=cart.objects.get(email__iexact =self.request.user.email).id,course=ck)
+    def get_queryset(self):
+        queryset=cart_courses.objects.filter(cart=cart.objects.get(email__iexact =self.request.user.email).id,course=self.request.data['course'])
+        print(queryset)
+        return queryset
+
+    def destroy(self,request,*args,**kwargs):
+        instance = self.get_object()
         print(instance)
         self.perform_destroy(instance)
         

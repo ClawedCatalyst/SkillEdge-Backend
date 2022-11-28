@@ -21,7 +21,7 @@ class AddCartSerializer(ModelSerializer):
         extra_kwargs = {'course': {'required': False},'cart': {'required': False} }
 
     def to_representation(self, instance):
-        email = self.request.user.email
+        email = self.context['request'].user.email
         ret = super().to_representation(instance)
         cart_details = cart.objects.get(email__iexact =email)
         ret['cart'] = cart_details.id
@@ -29,13 +29,14 @@ class AddCartSerializer(ModelSerializer):
         return ret
 
     def validate(self,data):
-        course_details = Course.objects.get(id = data['course'])
+        course_details = Course.objects.get(id = data['course'].id)
         if self.context['request'].user.id == course_details.educator_mail.id:
             raise ValidationError(
                 ({'msg':'You can not buy your self hosted course '})
                 )
-        course = user.purchasedCourse.get(course=data['course'])
-        if course.exists():
+        course = self.context['request'].user.purchasedCourse.filter(id=data['course'].id)
+        print(course)
+        if len(course)!=0:
             raise ValidationError(
                 ({'msg':'course already purchased'})
                 )       
