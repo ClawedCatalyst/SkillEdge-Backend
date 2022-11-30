@@ -10,14 +10,10 @@ from django.dispatch import receiver
 
 class cart(models.Model):
     user = models.OneToOneField(NewUserRegistration,on_delete=models.CASCADE,null=True )
-    email = models.EmailField(verbose_name='email address',
-        max_length=255,
-        unique=True,
-        validators=[EmailValidator()],null = True)
     total_price = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return self.email + " [" + str(self.total_price) + "] "
+        return str(self.user) + " [" + str(self.total_price) + "] "
 
 
 class cart_courses(models.Model):
@@ -26,17 +22,18 @@ class cart_courses(models.Model):
     price = models.PositiveIntegerField(validators=[MaxValueValidator(999)],default = 0)
 
     def __str__(self):
-        return self.cart.email + " [" + self.course.topic + "] "
+        return str(self.cart.user) + " [" + self.course.topic + "] "
 
 @receiver(pre_save, sender = cart_courses)
 def addcourse(sender, **kwargs):
     cart_item = kwargs['instance']
     course = Course.objects.get(id=cart_item.course.id)
-    cart_item.price = course.price
     cart_id = cart_item.cart.id
     cart_details = cart.objects.get(id = cart_id)
     cart_totalprice = cart_details.total_price
+    print(cart_totalprice)
+    print(course.price)
     cart_details.total_price = course.price + cart_totalprice
+    print(cart_details.total_price)
     cart_details.save()
-    print(cart_item)
     

@@ -41,7 +41,7 @@ class BuyCourseView(APIView):
         serializer_student = WalletSerializer(instance=student, data = request.data)
         if serializer_student.is_valid():
             serializer_student.save()
-            cart_details = cart.objects.get(email__iexact =email)
+            cart_details = cart.objects.get(user = request.user.id)
             cart_id = cart_details.id
             totalprice = cart_details.total_price
             cart_status = cart_courses.objects.filter(cart = cart_id, course = ck)
@@ -63,7 +63,7 @@ class BuyAllCourseView(APIView):
         student = NewUserRegistration.objects.get(email__iexact=email)
         if student.is_verified == False:
             return Response({'msg':'You are not verified! Verify your mail'}, status=status.HTTP_400_BAD_REQUEST)
-        cart_details = cart.objects.get(email__iexact =email)
+        cart_details = cart.objects.get(user = request.user.id)
         cart_id = cart_details.id
         totalprice=cart_details.total_price
         if student.wallet < totalprice :
