@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-u+n)#*$c@)#5ninfooe2-0%hkzma(7hg)#y0$rhz8&^22+ejgq
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["skilledge.herokuapp.com","0.0.0.0","127.0.0.1","skilledgedebug.herokuapp.com"]
+ALLOWED_HOSTS = ["skilledge.herokuapp.com","0.0.0.0","127.0.0.1","skilledgedebug.herokuapp.com","web-production-35c5.up.railway.app"]
 
 
 # Application definition
@@ -77,7 +77,7 @@ REST_FRAMEWORK = {
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 30
+    'PAGE_SIZE': 10
 }
 
 SIMPLE_JWT = {
