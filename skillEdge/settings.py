@@ -28,7 +28,7 @@ SECRET_KEY = 'django-insecure-u+n)#*$c@)#5ninfooe2-0%hkzma(7hg)#y0$rhz8&^22+ejgq
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["skilledge.herokuapp.com","0.0.0.0","127.0.0.1","skilledgedebug.herokuapp.com"]
+ALLOWED_HOSTS = ["skilledge.herokuapp.com","0.0.0.0","127.0.0.1","skilledgedebug.herokuapp.com","web-production-35c5.up.railway.app"]
 
 
 # Application definition
@@ -237,7 +237,7 @@ EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 CSRF_TRUSTED_ORIGINS = [
-    'https://skilledge.herokuapp.com'
+    'https://web-production-35c5.up.railway.app'
 ]
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
