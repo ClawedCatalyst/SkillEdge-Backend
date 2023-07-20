@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("courses", "0007_alter_feedbackmodel_user"),
         ("base", "0011_alter_newuserregistration_dateofbirth"),

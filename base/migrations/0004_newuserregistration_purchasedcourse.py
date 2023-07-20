@@ -5,7 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("base", "0001_squashed_0003_rename_interest_newuserregistration_interested"),
     ]

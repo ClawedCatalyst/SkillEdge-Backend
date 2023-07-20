@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('base', '0001_initial'),
+        ("base", "0001_initial"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='newuserregistration',
-            name='interest',
-            field=models.ManyToManyField(to='base.interests'),
+            model_name="newuserregistration",
+            name="interest",
+            field=models.ManyToManyField(to="base.interests"),
         ),
     ]

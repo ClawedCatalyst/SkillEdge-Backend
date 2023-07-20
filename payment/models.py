@@ -1,7 +1,9 @@
 from django.db import models
+
 from base.models import NewUserRegistration
 
 # Create your models here.
+
 
 class Order(models.Model):
     user_mail = models.ForeignKey(NewUserRegistration, on_delete=models.CASCADE)

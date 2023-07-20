@@ -4,7 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ("courses", "0008_feedbackmodel_sender"),
         ("base", "0012_alter_newuserregistration_purchasedcourse"),
